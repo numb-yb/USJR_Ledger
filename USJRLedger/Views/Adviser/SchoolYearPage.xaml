@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Adviser.SchoolYearPage"
+             Title="School Year Management">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <Frame BorderColor="Gray" Padding="15">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Current School Year" FontSize="20" FontAttributes="Bold" />
+
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Status:" FontAttributes="Bold" />
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="ActiveSchoolYearLabel" FontAttributes="Bold" />
+
+                        <Label Grid.Row="1" Grid.Column="0" Text="Start Date:" FontAttributes="Bold" />
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="StartDateLabel" />
+                    </Grid>
+
+                    <Button x:Name="EndSchoolYearButton" 
+                            Text="End School Year" 
+                            BackgroundColor="Orange" 
+                            Clicked="OnEndSchoolYearClicked"
+                            IsVisible="False" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="Gray" Padding="15" x:Name="StartNewYearFrame">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Start New School Year" FontSize="20" FontAttributes="Bold" />
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Semester" />
+                        <Entry x:Name="SemesterEntry" Placeholder="Enter semester (e.g. First, Second)" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Year" />
+                        <Entry x:Name="YearEntry" Placeholder="Enter year (e.g. 2024-2025)" />
+                    </VerticalStackLayout>
+
+                    <Button x:Name="StartSchoolYearButton" 
+                            Text="Start School Year" 
+                            Clicked="OnStartSchoolYearClicked"
+                            HorizontalOptions="End" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="Gray" Padding="15">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="School Year History" FontSize="20" FontAttributes="Bold" />
+
+                    <ListView x:Name="SchoolYearsListView" HasUnevenRows="True">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Grid Padding="10" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+                                        <Label Grid.Row="0" Grid.Column="0" 
+                                               Text="{Binding Semester, StringFormat='{0} Semester'}" 
+                                               FontAttributes="Bold" />
+
+                                        <Label Grid.Row="1" Grid.Column="0" 
+                                               Text="{Binding Year}" 
+                                               FontSize="14" />
+
+                                        <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Spacing="5">
+                                            <Label Text="Start:" FontSize="12" />
+                                            <Label Text="{Binding StartDate, StringFormat='{0:MMM dd, yyyy}'}" FontSize="12" />
+
+                                            <Label Text=" End:" FontSize="12" />
+                                            <Label Text="{Binding EndDate, StringFormat='{0:MMM dd, yyyy}'}" FontSize="12" />
+                                        </StackLayout>
+
+                                        <Label Grid.Row="0" Grid.Column="1" 
+                                               Grid.RowSpan="3" 
+                                               VerticalOptions="Center"
+                                               Text="{Binding IsActive, StringFormat='{0:Active;Inactive}'}"
+                                               TextColor="{Binding IsActive, StringFormat='{0:Green;Gray}'}"
+                                               FontAttributes="Bold" />
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

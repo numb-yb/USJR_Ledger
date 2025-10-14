@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Adviser.AdviserDashboardPage"
+             Title="Adviser Dashboard">
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <VerticalStackLayout Grid.Row="0" Spacing="20" Margin="0,0,0,20">
+            <Label x:Name="WelcomeLabel" FontSize="24" FontAttributes="Bold" />
+            <Label x:Name="OrganizationLabel" FontSize="18" FontAttributes="Bold" />
+
+            <!-- Responsive Button Grid -->
+            <Grid x:Name="ButtonGrid" Margin="0,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Buttons with margin and FillAndExpand for spacing -->
+                <Button x:Name="BtnViewOrg" Text="View Organization" Clicked="OnViewOrgProfileClicked"
+        Grid.Row="0" Grid.Column="0"
+        Margin="6,4"
+        FontSize="14"
+        CornerRadius="8"
+        HorizontalOptions="FillAndExpand" />
+                <Button x:Name="BtnManageOfficers" Text="Manage Officers" Clicked="OnManageOfficersClicked"
+        Grid.Row="0" Grid.Column="1"
+        Margin="6,4"
+        FontSize="14"
+        CornerRadius="8"
+        HorizontalOptions="FillAndExpand" />
+                <Button x:Name="BtnSchoolYear" Text="School Year" Clicked="OnSchoolYearClicked"
+        Grid.Row="0" Grid.Column="2"
+        Margin="6,4"
+        FontSize="14"
+        CornerRadius="8"
+        HorizontalOptions="FillAndExpand" />
+                <Button x:Name="BtnExpenseRequests" Text="Expense Requests" Clicked="OnExpenseRequestsClicked"
+        Grid.Row="0" Grid.Column="3"
+        Margin="6,4"
+        FontSize="14"
+        CornerRadius="8"
+        HorizontalOptions="FillAndExpand" />
+                <Button x:Name="BtnIncomeRequests" Text="Income Requests" Clicked="OnIncomeRequestsClicked"
+        Grid.Row="1" Grid.Column="0"
+        Margin="6,4"
+        FontSize="14"
+        CornerRadius="8"
+        HorizontalOptions="FillAndExpand" />
+                <Button x:Name="BtnEvents" Text="Events" Clicked="OnEventsClicked"
+        Grid.Row="1" Grid.Column="1"
+        Margin="6,4"
+        FontSize="14"
+        CornerRadius="8"
+        HorizontalOptions="FillAndExpand" />
+                <Button x:Name="BtnLogout" Text="Logout" Clicked="OnLogoutClicked" BackgroundColor="DarkRed"
+        Grid.Row="1" Grid.Column="2"
+        Margin="6,4"
+        FontSize="14"
+        CornerRadius="8"
+        HorizontalOptions="FillAndExpand" />
+
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup x:Name="OrientationStates">
+                        <!-- Portrait: 2 rows, 4 columns -->
+                        <VisualState x:Name="Portrait">
+                            <VisualState.Setters>
+                                <Setter TargetName="BtnViewOrg" Property="Grid.Row" Value="0"/>
+                                <Setter TargetName="BtnViewOrg" Property="Grid.Column" Value="0"/>
+                                <Setter TargetName="BtnManageOfficers" Property="Grid.Row" Value="0"/>
+                                <Setter TargetName="BtnManageOfficers" Property="Grid.Column" Value="1"/>
+                                <Setter TargetName="BtnSchoolYear" Property="Grid.Row" Value="0"/>
+                                <Setter TargetName="BtnSchoolYear" Property="Grid.Column" Value="2"/>
+                                <Setter TargetName="BtnExpenseRequests" Property="Grid.Row" Value="0"/>
+                                <Setter TargetName="BtnExpenseRequests" Property="Grid.Column" Value="3"/>
+                                <Setter TargetName="BtnIncomeRequests" Property="Grid.Row" Value="1"/>
+                                <Setter TargetName="BtnIncomeRequests" Property="Grid.Column" Value="0"/>
+                                <Setter TargetName="BtnEvents" Property="Grid.Row" Value="1"/>
+                                <Setter TargetName="BtnEvents" Property="Grid.Column" Value="1"/>
+                                <Setter TargetName="BtnLogout" Property="Grid.Row" Value="1"/>
+                                <Setter TargetName="BtnLogout" Property="Grid.Column" Value="2"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                        <!-- Landscape: 1 row, 7 columns -->
+                        <VisualState x:Name="Landscape">
+                            <VisualState.Setters>
+                                <Setter TargetName="BtnViewOrg" Property="Grid.Row" Value="0"/>
+                                <Setter TargetName="BtnViewOrg" Property="Grid.Column" Value="0"/>
+                                <Setter TargetName="BtnManageOfficers" Property="Grid.Row" Value="0"/>
+                                <Setter TargetName="BtnManageOfficers" Property="Grid.Column" Value="1"/>
+                                <Setter TargetName="BtnSchoolYear" Property="Grid.Row" Value="0"/>
+                                <Setter TargetName="BtnSchoolYear" Property="Grid.Column" Value="2"/>
+                                <Setter TargetName="BtnExpenseRequests" Property="Grid.Row" Value="0"/>
+                                <Setter TargetName="BtnExpenseRequests" Property="Grid.Column" Value="3"/>
+                                <Setter TargetName="BtnIncomeRequests" Property="Grid.Row" Value="0"/>
+                                <Setter TargetName="BtnIncomeRequests" Property="Grid.Column" Value="4"/>
+                                <Setter TargetName="BtnEvents" Property="Grid.Row" Value="0"/>
+                                <Setter TargetName="BtnEvents" Property="Grid.Column" Value="5"/>
+                                <Setter TargetName="BtnLogout" Property="Grid.Row" Value="0"/>
+                                <Setter TargetName="BtnLogout" Property="Grid.Column" Value="6"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+            </Grid>
+        </VerticalStackLayout>
+
+        <!-- The rest of your layout remains unchanged -->
+        <Grid Grid.Row="1" Margin="0,10,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Frame Grid.Column="0" Padding="10" Margin="5" BorderColor="Gray">
+                <VerticalStackLayout>
+                    <Label Text="Current Balance" FontSize="16" FontAttributes="Bold" />
+                    <Label x:Name="BalanceLabel" FontSize="20" TextColor="Green" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Grid.Column="1" Padding="10" Margin="5" BorderColor="Gray">
+                <VerticalStackLayout>
+                    <Label Text="Pending Expenses" FontSize="16" FontAttributes="Bold" />
+                    <Label x:Name="PendingExpensesLabel" FontSize="20" TextColor="Orange" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Grid.Column="2" Padding="10" Margin="5" BorderColor="Gray">
+                <VerticalStackLayout>
+                    <Label Text="Pending Income" FontSize="16" FontAttributes="Bold" />
+                    <Label x:Name="PendingIncomeLabel" FontSize="20" TextColor="Green" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Grid.Column="3" Padding="10" Margin="5" BorderColor="Gray">
+                <VerticalStackLayout>
+                    <Label Text="School Year Status" FontSize="16" FontAttributes="Bold" />
+                    <Label x:Name="SchoolYearStatusLabel" FontSize="20" />
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+
+        <Frame Grid.Row="2" Padding="10" BorderColor="Gray">
+            <VerticalStackLayout>
+                <Label Text="Notifications" FontSize="20" FontAttributes="Bold" Margin="0,0,0,10" />
+                <ListView x:Name="NotificationListView" RowHeight="60">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <StackLayout Padding="10" Orientation="Vertical">
+                                    <Label Text="{Binding Detail}" FontAttributes="Bold" />
+                                    <Label Text="{Binding DateString}" FontSize="12" TextColor="Gray" />
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </VerticalStackLayout>
+        </Frame>
+    </Grid>
+</ContentPage>

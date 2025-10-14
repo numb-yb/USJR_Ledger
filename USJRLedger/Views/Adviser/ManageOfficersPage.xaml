@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Adviser.ManageOfficersPage"
+             Title="Manage Officers">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <Frame BorderColor="Gray" Padding="15">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Add New Officer" FontSize="20" FontAttributes="Bold" />
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Full Name" />
+                        <Entry x:Name="NameEntry" Placeholder="Enter officer's full name" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Student ID (Username)" />
+                        <Entry x:Name="StudentIdEntry" Placeholder="Enter student ID" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Position" />
+                        <Entry x:Name="PositionEntry" Placeholder="Enter position (e.g. President, Treasurer)" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Temporary Password" />
+                        <Entry x:Name="PasswordEntry" Placeholder="Enter temporary password" IsPassword="True" />
+                    </VerticalStackLayout>
+
+                    <Button Text="Add Officer" 
+                            Clicked="OnAddOfficerClicked"
+                            HorizontalOptions="End" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="Gray" Padding="15">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Current Officers" FontSize="20" FontAttributes="Bold" />
+
+                    <ListView x:Name="OfficersListView" HasUnevenRows="True">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Frame Margin="5" Padding="10" BorderColor="Gray">
+                                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+                                            <Label Grid.Row="0" Grid.Column="0" 
+                                                   Text="{Binding Name}" 
+                                                   FontAttributes="Bold" 
+                                                   FontSize="16" />
+
+                                            <Label Grid.Row="1" Grid.Column="0" 
+                                                   Text="{Binding Position}" 
+                                                   FontSize="14" />
+
+                                            <StackLayout Grid.Row="2" Grid.Column="0" 
+                                                         Orientation="Horizontal" 
+                                                         Spacing="5">
+                                                <Label Text="Status:" FontAttributes="Bold" />
+                                                <Label Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" />
+                                            </StackLayout>
+
+                                            <Button Grid.Row="0" Grid.Column="1" 
+                                                    Grid.RowSpan="3" 
+                                                    VerticalOptions="Center"
+                                                    Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
+                                                    BackgroundColor="{Binding IsActive, StringFormat='Red;Green'}"
+                                                    BindingContext="{Binding .}"
+                                                    Clicked="OnToggleStatusClicked" />
+                                        </Grid>
+                                    </Frame>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

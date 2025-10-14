@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Officer.OfficerDashboardPage"
+             Title="Officer Dashboard">
+
+    <!-- ✅ Prevent overflow in portrait -->
+    <ScrollView>
+        <Grid Padding="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Header Section -->
+            <VerticalStackLayout Grid.Row="0" 
+                                 Spacing="20"
+                                 Margin="0,0,0,20">
+
+                <!-- ✅ User info -->
+                <Label x:Name="WelcomeLabel"
+                       Text="Welcome, Jak Menguez"
+                       FontSize="24"
+                       FontAttributes="Bold" />
+
+                <Label x:Name="OrganizationLabel"
+                       Text="Organization: ComEs (Engineering)"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="Gray" />
+
+                <Label x:Name="PositionLabel"
+                       Text="Position: President"
+                       FontSize="16"
+                       TextColor="Gray" />
+
+                <!-- ✅ Wrapping Buttons -->
+                <FlexLayout Wrap="Wrap"
+                            Direction="Row"
+                            JustifyContent="Start"
+                            AlignItems="Start"
+                            Margin="0,10,0,0">
+
+                    <Button Text="View Organization" 
+                            Clicked="OnViewOrgProfileClicked"
+                            Margin="5" />
+                    <Button Text="Create Event" 
+                            Clicked="OnCreateEventClicked" 
+                            Margin="5" />
+                    <Button Text="Add Expense"
+                            Clicked="OnAddExpenseClicked" 
+                            Margin="5" />
+                    <Button Text="Add Income" 
+                            Clicked="OnAddIncomeClicked"
+                            Margin="5" />
+                    <Button Text="Logout"
+                            Clicked="OnLogoutClicked"
+                            Margin="5" 
+                            BackgroundColor="DarkRed" 
+                            TextColor="White" />
+                </FlexLayout>
+            </VerticalStackLayout>
+
+            <!-- Cards Section -->
+            <Grid Grid.Row="1" 
+                  Margin="0,10,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition 
+                        Width="*" />
+                    <ColumnDefinition 
+                        Width="*" />
+                    <ColumnDefinition 
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- ✅ Current Balance -->
+                <Frame Grid.Column="0" 
+                       Padding="10" 
+                       Margin="5" 
+                       BorderColor="Gray" 
+                       CornerRadius="10">
+                    <VerticalStackLayout>
+                        <Label Text="Current Balance" 
+                               FontSize="16"
+                               FontAttributes="Bold" />
+                        <Label x:Name="BalanceLabel"
+                               Text="₱ 0.00"
+                               FontSize="20"
+                               TextColor="Green" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ✅ Pending Expenses -->
+                <Frame Grid.Column="1"
+                       Padding="10" 
+                       Margin="5"
+                       BorderColor="Gray" 
+                       CornerRadius="10">
+                    <VerticalStackLayout>
+                        <Label Text="Pending Expenses" 
+                               FontSize="16" 
+                               FontAttributes="Bold" />
+                        <Label x:Name="PendingExpensesLabel"
+                               Text="0"
+                               FontSize="20"
+                               TextColor="Orange" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- ✅ School Year -->
+                <Frame Grid.Column="2" 
+                       Padding="10"
+                       Margin="5" 
+                       BorderColor="Gray" 
+                       CornerRadius="10">
+                    <VerticalStackLayout>
+                        <Label Text="School Year" 
+                               FontSize="16" 
+                               FontAttributes="Bold" />
+                        <Label x:Name="SchoolYearLabel"
+                               Text="No Active School Year"
+                               FontSize="20"
+                               TextColor="Gray" />
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- Transactions List -->
+            <Frame Grid.Row="2" 
+                   Padding="10" 
+                   BorderColor="Gray" 
+                   CornerRadius="10">
+                <VerticalStackLayout>
+                    <Label Text="Recent Transactions"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           Margin="0,0,0,10" />
+
+                    <ListView x:Name="TransactionsListView" 
+                              RowHeight="60">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Grid 
+                                        Padding="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition
+                                                Width="*" />
+                                            <ColumnDefinition
+                                                Width="Auto" />
+                                            <ColumnDefinition 
+                                                Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <VerticalStackLayout 
+                                            Grid.Column="0">
+                                            <Label Text="{Binding Detail}" 
+                                                   FontAttributes="Bold" />
+                                            <Label Text="{Binding DateString}" 
+                                                   FontSize="12"
+                                                   TextColor="Gray" />
+                                        </VerticalStackLayout>
+
+                                        <Label Grid.Column="1"
+                                               Text="{Binding AmountString}"
+                                               VerticalOptions="Center" />
+                                        <Label Grid.Column="2"
+                                               Text="{Binding StatusString}"
+                                               VerticalOptions="Center"
+                                               Margin="10,0,0,0" />
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+    </ScrollView>
+</ContentPage>

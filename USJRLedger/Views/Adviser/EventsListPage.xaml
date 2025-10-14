@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Adviser.EventsListPage"
+             Title="Events">
+    <VerticalStackLayout Padding="20" Spacing="20">
+        <Label x:Name="SchoolYearLabel" FontSize="18" FontAttributes="Bold" />
+
+        <Label Text="All Events" FontSize="20" FontAttributes="Bold" />
+
+        <Label x:Name="NoEventsLabel" 
+               Text="No events found for the current school year"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               FontSize="16"
+               TextColor="Gray"
+               IsVisible="False" />
+
+        <ListView x:Name="EventsListView" HasUnevenRows="True">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Frame Margin="5" Padding="10" BorderColor="Gray">
+                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                                <Label Grid.Row="0" Grid.Column="0" 
+                                       Text="{Binding Name}" 
+                                       FontAttributes="Bold" 
+                                       FontSize="16" />
+
+                                <StackLayout Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="5">
+                                    <Label Text="Event Date:" FontAttributes="Bold" />
+                                    <Label Text="{Binding EventDate}" />
+                                </StackLayout>
+
+                                <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Spacing="5">
+                                    <Label Text="Balance:" FontAttributes="Bold" />
+                                    <Label Text="{Binding Balance}" TextColor="{Binding BalanceAmount, Converter={StaticResource AmountColorConverter}}" />
+                                </StackLayout>
+
+                                <Button Grid.Row="0" Grid.Column="1" 
+                                        Grid.RowSpan="3" 
+                                        VerticalOptions="Center"
+                                        Text="View Details"
+                                        BindingContext="{Binding .}"
+                                        Clicked="OnViewEventDetailsClicked" />
+                            </Grid>
+                        </Frame>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </VerticalStackLayout>
+</ContentPage>

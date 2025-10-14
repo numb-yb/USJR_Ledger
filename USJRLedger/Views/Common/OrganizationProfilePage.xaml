@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Common.OrganizationProfilePage"
+             Title="Organization Profile">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <Frame BorderColor="Gray" Padding="15">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Organization Information" FontSize="20" FontAttributes="Bold" />
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Name:" FontAttributes="Bold" />
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="OrganizationNameLabel" />
+
+                        <Label Grid.Row="1" Grid.Column="0" Text="Department:" FontAttributes="Bold" />
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="DepartmentLabel" />
+
+                        <Label Grid.Row="2" Grid.Column="0" Text="Status:" FontAttributes="Bold" />
+                        <Label Grid.Row="2" Grid.Column="1" x:Name="StatusLabel" />
+
+                        <Label Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="DeactivationDateLabel" 
+                               IsVisible="false" TextColor="Red" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="Gray" Padding="15">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Financial Summary" FontSize="20" FontAttributes="Bold" />
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Total Income:" FontAttributes="Bold" />
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="TotalIncomeLabel" TextColor="Green" />
+
+                        <Label Grid.Row="1" Grid.Column="0" Text="Total Expenses:" FontAttributes="Bold" />
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="TotalExpensesLabel" TextColor="Red" />
+
+                        <Label Grid.Row="2" Grid.Column="0" Text="Current Balance:" FontAttributes="Bold" />
+                        <Label Grid.Row="2" Grid.Column="1" x:Name="BalanceLabel" FontSize="18" FontAttributes="Bold" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="Gray" Padding="15">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Events" FontSize="20" FontAttributes="Bold" />
+                    <ListView x:Name="EventsListView" HeightRequest="300">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Grid Padding="10" ColumnDefinitions="*,Auto">
+                                        <VerticalStackLayout Grid.Column="0">
+                                            <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                            <Label Text="{Binding CreatedDate, StringFormat='{0:MMM dd, yyyy}'}" 
+                                                  FontSize="12" TextColor="Gray" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="1" 
+                                              Text="{Binding EventDate, StringFormat='{0:MMM dd, yyyy}'}" 
+                                              VerticalOptions="Center" />
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

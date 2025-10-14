@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Admin.ViewOrganizationsPage"
+             Title="Organizations">
+
+    <VerticalStackLayout Padding="20" Spacing="20">
+        <Label Text="All Organizations"
+               FontSize="20"
+               FontAttributes="Bold"
+               Margin="0,0,0,8"/>
+
+        <!--  Replaced ListView + Frame with CollectionView + Border -->
+        <CollectionView x:Name="OrganizationsListView"
+                        SelectionMode="None"
+                        ItemsLayout="VerticalList"
+                        VerticalOptions="FillAndExpand">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <!--  Border instead of Frame -->
+                    <Border Stroke="Gray"
+                            StrokeShape="RoundRectangle 12"
+                            BackgroundColor="White"
+                            Padding="10"
+                            Margin="5">
+
+                        <!-- Optional subtle shadow (works safely in MAUI 7/8) -->
+                        <Border.Shadow>
+                            <Shadow Brush="#00000022"
+                                    Offset="5,5"
+                                    Radius="8"/>
+                        </Border.Shadow>
+
+                        <Grid ColumnDefinitions="*,Auto"
+                              RowDefinitions="Auto,Auto,Auto"
+                              ColumnSpacing="8"
+                              RowSpacing="6">
+
+                            <!-- Organization Name -->
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   Text="{Binding Name}"
+                                   FontAttributes="Bold"
+                                   FontSize="18"/>
+
+                            <!-- Department -->
+                            <Label Grid.Row="1" Grid.Column="0"
+                                   Text="{Binding Department}"
+                                   FontSize="14"
+                                   TextColor="Gray"/>
+
+                            <!-- Status -->
+                            <HorizontalStackLayout Grid.Row="2" Grid.Column="0"
+                                                   Spacing="5">
+                                <Label Text="Status:" FontAttributes="Bold"/>
+                                <Label Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}"
+                                       TextColor="{Binding IsActive, Converter={StaticResource BoolToColorConverter}}"/>
+                            </HorizontalStackLayout>
+
+                            <!-- Buttons -->
+                            <VerticalStackLayout Grid.Row="0" Grid.Column="1"
+                                                 Grid.RowSpan="3"
+                                                 VerticalOptions="Center"
+                                                 Spacing="8">
+                                <Button Text="View Details"
+                                        BindingContext="{Binding .}"
+                                        Clicked="OnViewDetailsClicked"
+                                        BackgroundColor="#5C4DFF"
+                                        TextColor="White"
+                                        CornerRadius="8"
+                                        HeightRequest="36"
+                                        FontSize="14"/>
+
+                                <Button Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
+                                        BackgroundColor="{Binding IsActive, Converter={StaticResource BoolToColorConverter}}"
+                                        BindingContext="{Binding .}"
+                                        Clicked="OnUpdateStatusClicked"
+                                        TextColor="White"
+                                        CornerRadius="8"
+                                        HeightRequest="36"
+                                        FontSize="14"/>
+                            </VerticalStackLayout>
+
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>

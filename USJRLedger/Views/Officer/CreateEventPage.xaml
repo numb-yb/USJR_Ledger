@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Officer.CreateEventPage"
+             Title="Create Event">
+    <VerticalStackLayout Padding="20" Spacing="20">
+        <Label x:Name="SchoolYearLabel" FontSize="18" FontAttributes="Bold" />
+
+        <Frame BorderColor="Gray" Padding="15">
+            <VerticalStackLayout Spacing="15">
+                <Label Text="Event Information" FontSize="20" FontAttributes="Bold" />
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Event Name" />
+                    <Entry x:Name="EventNameEntry" Placeholder="Enter event name" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Event Date" />
+                    <DatePicker x:Name="EventDatePicker" />
+                </VerticalStackLayout>
+
+                <HorizontalStackLayout Spacing="10" HorizontalOptions="End">
+                    <Button Text="Cancel" Clicked="OnCancelClicked" BackgroundColor="Gray" />
+                    <Button Text="Create Event" Clicked="OnCreateEventClicked" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+    </VerticalStackLayout>
+</ContentPage>

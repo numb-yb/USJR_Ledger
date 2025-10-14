@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Adviser.EventDetailsPage"
+             Title="Event Details">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <Frame BorderColor="Gray" Padding="15">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Event Information" FontSize="20" FontAttributes="Bold" />
+
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Name:" FontAttributes="Bold" />
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="EventNameLabel" />
+
+                        <Label Grid.Row="1" Grid.Column="0" Text="Event Date:" FontAttributes="Bold" />
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="EventDateLabel" />
+
+                        <Label Grid.Row="2" Grid.Column="0" Text="Created By:" FontAttributes="Bold" />
+                        <Label Grid.Row="2" Grid.Column="1" x:Name="CreatedByLabel" />
+
+                        <Label Grid.Row="3" Grid.Column="0" Text="Created Date:" FontAttributes="Bold" />
+                        <Label Grid.Row="3" Grid.Column="1" x:Name="CreatedDateLabel" />
+
+                        <Label Grid.Row="4" Grid.Column="0" Text="Balance:" FontAttributes="Bold" />
+                        <Label Grid.Row="4" Grid.Column="1" x:Name="BalanceLabel" FontAttributes="Bold" />
+                    </Grid>
+
+                    <Button Text="Generate Event Statement" 
+                            Clicked="OnGenerateStatementClicked"
+                            Margin="0,10,0,0" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="Gray" Padding="15">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Income" FontSize="18" FontAttributes="Bold" />
+                        <StackLayout Grid.Column="1" Orientation="Horizontal" Spacing="5">
+                            <Label Text="Total:" VerticalOptions="Center" />
+                            <Label x:Name="TotalIncomeLabel" VerticalOptions="Center" FontAttributes="Bold" TextColor="Green" />
+                        </StackLayout>
+                    </Grid>
+
+                    <Label x:Name="NoIncomeLabel" 
+                           Text="No income recorded for this event"
+                           HorizontalOptions="Center"
+                           FontSize="14"
+                           TextColor="Gray"
+                           IsVisible="False" />
+
+                    <ListView x:Name="IncomeListView" HasUnevenRows="True">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Grid Padding="10" ColumnDefinitions="*,Auto,Auto">
+                                        <VerticalStackLayout Grid.Column="0">
+                                            <Label Text="{Binding Detail}" FontAttributes="Bold" />
+                                            <StackLayout Orientation="Horizontal" Spacing="5">
+                                                <Label Text="{Binding CreatedBy}" FontSize="12" />
+                                                <Label Text="{Binding DateString}" FontSize="12" TextColor="Gray" />
+                                            </StackLayout>
+                                        </VerticalStackLayout>
+
+                                        <Label Grid.Column="1" 
+                                               Text="{Binding Amount}" 
+                                               VerticalOptions="Center"
+                                               TextColor="Green" />
+
+                                        <Button Grid.Column="2" 
+                                               Text="View Receipt" 
+                                               IsVisible="{Binding HasReceipt}"
+                                               BindingContext="{Binding .}"
+                                               Clicked="OnViewReceiptClicked" />
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="Gray" Padding="15">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Expenses" FontSize="18" FontAttributes="Bold" />
+                        <StackLayout Grid.Column="1" Orientation="Horizontal" Spacing="5">
+                            <Label Text="Total:" VerticalOptions="Center" />
+                            <Label x:Name="TotalExpensesLabel" VerticalOptions="Center" FontAttributes="Bold" TextColor="Red" />
+                        </StackLayout>
+                    </Grid>
+
+                    <Label x:Name="NoExpensesLabel" 
+                           Text="No expenses recorded for this event"
+                           HorizontalOptions="Center"
+                           FontSize="14"
+                           TextColor="Gray"
+                           IsVisible="False" />
+
+                    <ListView x:Name="ExpenseListView" HasUnevenRows="True">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Grid Padding="10" ColumnDefinitions="*,Auto,Auto">
+                                        <VerticalStackLayout Grid.Column="0">
+                                            <Label Text="{Binding Detail}" FontAttributes="Bold" />
+                                            <StackLayout Orientation="Horizontal" Spacing="5">
+                                                <Label Text="{Binding CreatedBy}" FontSize="12" />
+                                                <Label Text="{Binding DateString}" FontSize="12" TextColor="Gray" />
+                                            </StackLayout>
+                                        </VerticalStackLayout>
+
+                                        <Label Grid.Column="1" 
+                                               Text="{Binding Amount}" 
+                                               VerticalOptions="Center"
+                                               TextColor="Red" />
+
+                                        <Button Grid.Column="2" 
+                                               Text="View Receipt" 
+                                               IsVisible="{Binding HasReceipt}"
+                                               BindingContext="{Binding .}"
+                                               Clicked="OnViewReceiptClicked" />
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

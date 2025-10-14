@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:USJRLedger"
+             xmlns:converters="clr-namespace:USJRLedger.Converters"
+             x:Class="USJRLedger.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Converters -->
+            <converters:BoolToStatusConverter x:Key="BoolToStatusConverter" />
+            <converters:BoolToActionConverter x:Key="BoolToActionConverter" />
+            <converters:AmountColorConverter x:Key="AmountColorConverter" />
+
+            <!-- Other resources -->
+            <Color x:Key="Primary">#512BD4</Color>
+            <Color x:Key="Secondary">#DFD8F7</Color>
+            <Color x:Key="Tertiary">#2B0B98</Color>
+            <!-- ... other resources ... -->
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
