@@ -9,12 +9,7 @@ namespace USJRLedger
         {
             InitializeComponent();
 
-            // Initialize services
-            var dataService = new DataService();
-            var authService = new AuthService(dataService);
-
-            // Set the main page to the login page
-            MainPage = new NavigationPage(new LoginPage(authService));
+            MainPage = new SplashPage();
         }
     }
 }

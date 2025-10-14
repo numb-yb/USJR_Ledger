@@ -1,104 +1,139 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage 
+<ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="USJRLedger.Views.Admin.AdminDashboardPage"
-    Title="Admin Dashboard">
+    Title="Admin Dashboard"
+    BackgroundColor="#f5f5f7">
 
     <ScrollView>
         <Grid Padding="20">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Label 
+            <!-- Header -->
+            <Label
                 Text="Welcome, System Administrator"
                 FontSize="24"
                 FontAttributes="Bold"
                 HorizontalOptions="Center"
-                Margin="0,12,0,12"/>
+                Margin="0,12,0,20" />
 
-            <StackLayout x:Name="MainLayout"
-                         Grid.Row="1"
-                         Spacing="20"
-                         HorizontalOptions="Center"
-                         WidthRequest="{OnIdiom Phone=Auto, Tablet=600}">
+            <!-- Main Layout -->
+            <StackLayout
+                x:Name="MainLayout"
+                Grid.Row="1"
+                Spacing="25"
+                HorizontalOptions="Center"
+                WidthRequest="{OnIdiom Phone=Auto, Tablet=600}">
 
                 <!-- Action Buttons -->
-                <StackLayout x:Name="ActionButtons" 
-                             Orientation="Vertical" 
-                             Spacing="12">
-                    <Button Text="Create Organization" 
-                            BackgroundColor="#5C4DFF" 
-                            TextColor="White" 
-                            CornerRadius="8" 
-                            HeightRequest="48" 
-                            FontSize="16" 
-                            HorizontalOptions="FillAndExpand"/>
-                    <Button Text="View Organizations" 
-                            BackgroundColor="#5C4DFF" 
+                <VerticalStackLayout Spacing="12">
+                    <Button
+                        Text="Create Organization"
+                        BackgroundColor="#5C4DFF"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HeightRequest="48"
+                        FontSize="16"
+                        HorizontalOptions="FillAndExpand" />
+
+                    <Button
+                        Text="View Organizations"
+                        BackgroundColor="#5C4DFF"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HeightRequest="48"
+                        FontSize="16"
+                        HorizontalOptions="FillAndExpand" />
+
+                    <Button
+                        Text="Manage Advisers"
+                        BackgroundColor="#5C4DFF"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HeightRequest="48"
+                        FontSize="16"
+                        HorizontalOptions="FillAndExpand" />
+                </VerticalStackLayout>
+
+                <!-- System Actions + Quick Stats -->
+                <Grid RowDefinitions="Auto,Auto"
+                      Padding="0,10,0,0"
+                      RowSpacing="25">
+
+                    <!-- Reset and Logout Buttons -->
+                    <HorizontalStackLayout
+                        x:Name="SystemActions"
+                        Spacing="16"
+                        HorizontalOptions="Center"
+                        Margin="10,0,10,0"
+                        Grid.Row="0">
+                        <Button
+                            Text="RESET ENTIRE SYSTEM"
+                            BackgroundColor="#FF0000"
                             TextColor="White"
-                            CornerRadius="8" 
-                            HeightRequest="48" 
-                            FontSize="16" 
-                            HorizontalOptions="FillAndExpand"/>
-                    <Button Text="Manage Advisers"
-                            BackgroundColor="#5C4DFF" 
-                            TextColor="White" 
-                            CornerRadius="8"
-                            HeightRequest="48" 
-                            FontSize="16" 
-                            HorizontalOptions="FillAndExpand"/>
-                </StackLayout>
+                            CornerRadius="10"
+                            HeightRequest="50"
+                            FontSize="16"
+                            HorizontalOptions="FillAndExpand"
+                            WidthRequest="{OnIdiom Phone=150, Tablet=220}" />
 
-                <!-- System Actions -->
-                <HorizontalStackLayout Spacing="16" 
-                                       HorizontalOptions="Center" 
-                                       Margin="0,16,0,0">
-                    <Button Text="RESET ENTIRE SYSTEM" 
-                            BackgroundColor="Red" 
-                            TextColor="White" 
-                            CornerRadius="8"
-                            HeightRequest="48" 
-                            FontSize="16" />
-                    <Button Text="Logout" 
-                            BackgroundColor="#B71C1C" 
-                            TextColor="White" 
-                            CornerRadius="8" 
-                            HeightRequest="48" 
-                            FontSize="16" />
-                </HorizontalStackLayout>
+                        <Button
+                            Text="Logout"
+                            BackgroundColor="#8B0000"
+                            TextColor="White"
+                            CornerRadius="10"
+                            HeightRequest="50"
+                            FontSize="16"
+                            HorizontalOptions="FillAndExpand"
+                            WidthRequest="{OnIdiom Phone=150, Tablet=220}" />
+                    </HorizontalStackLayout>
 
-                <!-- Quick Stats -->
-                <Frame Margin="0,24,0,0" 
-                       Padding="16"
-                       BorderColor="Gray" 
-                       CornerRadius="12" 
-                       HasShadow="True" 
-                       HorizontalOptions="FillAndExpand">
-                    <VerticalStackLayout>
-                        <Label Text="Quick Stats" 
-                               FontSize="18" 
-                               FontAttributes="Bold" 
-                               Margin="0,0,0,8" />
-                        <Label Text="Total Organizations: 0" 
-                               FontSize="14" 
-                               TextColor="Gray" />
-                        <Label Text="Active Organizations: 0"
-                               FontSize="14" 
-                               TextColor="Gray" />
-                        <Label Text="Total Advisers: 0" 
-                               FontSize="14" 
-                               TextColor="Gray" />
-                        <Label Text="Total Transactions: 0" 
-                               FontSize="14" 
-                               TextColor="Gray" />
-                        <Label Text="Total Events: 0" 
-                               FontSize="14" 
-                               TextColor="Gray" />
-                    </VerticalStackLayout>
-                </Frame>
+                    <!-- Quick Stats Box -->
+                    <Frame
+                        Grid.Row="1"
+                        Padding="20"
+                        Margin="10,0,10,25"
+                        BorderColor="#D0D0D0"
+                        CornerRadius="14"
+                        HasShadow="True"
+                        BackgroundColor="White"
+                        HorizontalOptions="FillAndExpand">
+
+                        <VerticalStackLayout Spacing="6">
+                            <Label
+                                Text="Quick Stats"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                TextColor="#333"
+                                Margin="0,0,0,8" />
+                            <Label
+                                Text="Total Organizations: 0"
+                                FontSize="14"
+                                TextColor="Gray" />
+                            <Label
+                                Text="Active Organizations: 0"
+                                FontSize="14"
+                                TextColor="Gray" />
+                            <Label
+                                Text="Total Advisers: 0"
+                                FontSize="14"
+                                TextColor="Gray" />
+                            <Label
+                                Text="Total Transactions: 0"
+                                FontSize="14"
+                                TextColor="Gray" />
+                            <Label
+                                Text="Total Events: 0"
+                                FontSize="14"
+                                TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+
             </StackLayout>
         </Grid>
     </ScrollView>

@@ -19,12 +19,12 @@ namespace USJRLedger.Views.Common
 
         private async void OnLoginClicked(object sender, EventArgs e)
         {
-            string username = UsernameEntry.Text;
+            string username = UsernameEntry.Text?.Trim();
             string password = PasswordEntry.Text;
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                StatusLabel.Text = "Please enter both username and password";
+                StatusLabel.Text = "Please enter both username and password.";
                 return;
             }
 
@@ -32,14 +32,14 @@ namespace USJRLedger.Views.Common
 
             if (isLoggedIn)
             {
-                // Check if password change is required
+                // Check if user must change their temporary password
                 if (_authService.RequiresPasswordChange())
                 {
                     await Navigation.PushAsync(new ChangePasswordPage(_authService));
                     return;
                 }
 
-                // Navigate to the appropriate dashboard based on user role
+                // Navigate based on role
                 Page dashboardPage = _authService.CurrentUser.Role switch
                 {
                     UserRole.Admin => new AdminDashboardPage(_authService),
@@ -48,13 +48,19 @@ namespace USJRLedger.Views.Common
                     _ => throw new NotImplementedException("Unknown user role")
                 };
 
-                // Replace the navigation stack with the dashboard page
+                // Replace navigation stack with the dashboard
                 Application.Current.MainPage = new NavigationPage(dashboardPage);
             }
             else
             {
-                StatusLabel.Text = "Invalid username or password";
+                StatusLabel.Text = "Invalid username or password.";
             }
+        }
+
+        // Forgot Password Tap Handler
+        private async void OnForgotPasswordTapped(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new ResetPasswordPage(_authService));
         }
     }
 }
