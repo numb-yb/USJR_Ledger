@@ -102,5 +102,18 @@ namespace USJRLedger.Services
                 await _dataService.SaveToFileAsync(users, "users.json");
             }
         }
+        public async Task DeleteUserAsync(string id)
+        {
+            var users = await _dataService.LoadFromFileAsync<User>("users.json");
+            var userToRemove = users.FirstOrDefault(u => u.Id == id);
+
+            if (userToRemove != null)
+            {
+                users.Remove(userToRemove);
+                await _dataService.SaveToFileAsync(users, "users.json");
+            }
+        }
+
+
     }
 }

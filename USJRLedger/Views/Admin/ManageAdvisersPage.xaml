@@ -3,30 +3,50 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="USJRLedger.Views.Admin.ManageAdvisersPage"
              Title="Manage Advisers">
+
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Add Adviser Section -->
             <Frame BorderColor="Gray" Padding="15">
                 <VerticalStackLayout Spacing="15">
                     <Label Text="Add New Adviser" FontSize="20" FontAttributes="Bold" />
 
+                    <!-- Full Name -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Full Name" />
                         <Entry x:Name="NameEntry" Placeholder="Enter adviser's full name" />
                     </VerticalStackLayout>
 
+                    <!-- Employee ID -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Employee ID (Username)" />
                         <Entry x:Name="UsernameEntry" Placeholder="Enter employee ID" />
                     </VerticalStackLayout>
 
+                    <!-- Temporary Password -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Temporary Password" />
                         <Entry x:Name="PasswordEntry" Placeholder="Enter temporary password" IsPassword="True" />
                     </VerticalStackLayout>
 
+                    <!-- Organization Picker -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Organization" />
-                        <Picker x:Name="OrganizationPicker" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Picker x:Name="OrganizationPicker"
+                                    Title="Select organization"
+                                    ItemDisplayBinding="{Binding Name}" />
+                            <Button x:Name="ClearOrganizationButton"
+                                    Text="Clear"
+                                    BackgroundColor="Transparent"
+                                    TextColor="Black"
+                                    FontAttributes="Bold"
+                                    IsVisible="False"
+                                    Clicked="OnClearOrganizationClicked"
+                                    Grid.Column="1"
+                                    VerticalOptions="Center" />
+                        </Grid>
                     </VerticalStackLayout>
 
                     <Button Text="Add Adviser" 
@@ -35,45 +55,65 @@
                 </VerticalStackLayout>
             </Frame>
 
+            <!-- Existing Advisers Section -->
             <Frame BorderColor="Gray" Padding="15">
                 <VerticalStackLayout Spacing="15">
                     <Label Text="Existing Advisers" FontSize="20" FontAttributes="Bold" />
 
-                    <ListView x:Name="AdvisersListView" HasUnevenRows="True">
-                        <ListView.ItemTemplate>
+                    <!-- Changed from ListView to CollectionView -->
+                    <CollectionView x:Name="AdvisersCollectionView"
+                                    ItemsLayout="VerticalList"
+                                    SelectionMode="None">
+                        <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <ViewCell>
-                                    <Frame Margin="5" Padding="10" BorderColor="Gray">
-                                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
-                                            <Label Grid.Row="0" Grid.Column="0" 
-                                                   Text="{Binding Name}" 
-                                                   FontAttributes="Bold" 
-                                                   FontSize="16" />
+                                <Frame Margin="5" Padding="10" BorderColor="Gray" HasShadow="False">
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+                                        <!-- Name -->
+                                        <Label Grid.Row="0" Grid.Column="0" 
+                                               Text="{Binding Name}" 
+                                               FontAttributes="Bold" 
+                                               FontSize="16" />
 
-                                            <Label Grid.Row="1" Grid.Column="0" 
-                                                   Text="{Binding Username}" 
-                                                   FontSize="14" />
+                                        <!-- Username -->
+                                        <Label Grid.Row="1" Grid.Column="0" 
+                                               Text="{Binding Username}" 
+                                               FontSize="14" />
 
-                                            <StackLayout Grid.Row="2" Grid.Column="0" 
-                                                         Orientation="Horizontal" 
-                                                         Spacing="5">
-                                                <Label Text="Status:" FontAttributes="Bold" />
-                                                <Label Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" />
-                                            </StackLayout>
+                                        <!-- Status -->
+                                        <StackLayout Grid.Row="2" Grid.Column="0" 
+                                                     Orientation="Horizontal" 
+                                                     Spacing="5">
+                                            <Label Text="Status:" FontAttributes="Bold" />
+                                            <Label Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" />
+                                        </StackLayout>
 
-                                            <Button Grid.Row="0" Grid.Column="1" 
-                                                    Grid.RowSpan="3" 
-                                                    VerticalOptions="Center"
-                                                    Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
-                                                    BackgroundColor="{Binding IsActive, StringFormat='Red;Green'}"
+                                        <!-- Buttons -->
+                                        <VerticalStackLayout Grid.Row="0" 
+                                                             Grid.Column="1"
+                                                             Grid.RowSpan="3"
+                                                             Spacing="8"
+                                                             VerticalOptions="Center">
+                                            <Button Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
+                                                    BackgroundColor="#6200EE"
+                                                    TextColor="White"
                                                     BindingContext="{Binding .}"
-                                                    Clicked="OnToggleStatusClicked" />
-                                        </Grid>
-                                    </Frame>
-                                </ViewCell>
+                                                    Clicked="OnToggleStatusClicked"
+                                                    CornerRadius="6"
+                                                    HeightRequest="35"/>
+
+                                            <Button Text="Delete"
+                                                    BackgroundColor="#D32F2F"
+                                                    TextColor="White"
+                                                    BindingContext="{Binding .}"
+                                                    Clicked="OnDeleteAdviserClicked"
+                                                    CornerRadius="6"
+                                                    HeightRequest="35"/>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Frame>
                             </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </VerticalStackLayout>
             </Frame>
         </VerticalStackLayout>

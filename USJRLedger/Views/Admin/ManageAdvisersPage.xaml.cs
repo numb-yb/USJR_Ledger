@@ -1,5 +1,6 @@
 using USJRLedger.Models;
 using USJRLedger.Services;
+using Microsoft.Maui.Dispatching;
 
 namespace USJRLedger.Views.Admin
 {
@@ -15,10 +16,16 @@ namespace USJRLedger.Views.Admin
         public ManageAdvisersPage(AuthService authService, DataService dataService)
         {
             InitializeComponent();
+
             _authService = authService;
             _dataService = dataService;
             _userService = new UserService(dataService);
             _organizationService = new OrganizationService(dataService);
+
+            OrganizationPicker.SelectedIndexChanged += (s, e) =>
+            {
+                ClearOrganizationButton.IsVisible = OrganizationPicker.SelectedItem != null;
+            };
 
             LoadDataAsync();
         }
@@ -35,16 +42,30 @@ namespace USJRLedger.Views.Admin
             {
                 _organizations = await _organizationService.GetAllOrganizationsAsync();
                 _organizations = _organizations.Where(o => o.IsActive).ToList();
-                OrganizationPicker.ItemsSource = _organizations;
-                OrganizationPicker.ItemDisplayBinding = new Binding("Name");
 
                 _advisers = await _userService.GetUsersByRoleAsync(UserRole.Adviser);
-                AdvisersListView.ItemsSource = _advisers;
+
+                Dispatcher.Dispatch(() =>
+                {
+                    OrganizationPicker.ItemsSource = _organizations;
+                    OrganizationPicker.ItemDisplayBinding = new Binding("Name");
+                    AdvisersCollectionView.ItemsSource = _advisers;
+                });
             }
             catch (Exception ex)
             {
                 await DisplayAlert("Error", $"Failed to load data: {ex.Message}", "OK");
             }
+        }
+
+        private async Task RefreshAdvisersAsync()
+        {
+            _advisers = await _userService.GetUsersByRoleAsync(UserRole.Adviser);
+            Dispatcher.Dispatch(() =>
+            {
+                AdvisersCollectionView.ItemsSource = null;
+                AdvisersCollectionView.ItemsSource = _advisers;
+            });
         }
 
         private async void OnAddAdviserClicked(object sender, EventArgs e)
@@ -58,25 +79,18 @@ namespace USJRLedger.Views.Admin
                 return;
             }
 
-            string name = NameEntry.Text;
-            string username = UsernameEntry.Text;
-            string password = PasswordEntry.Text;
-            var selectedOrg = OrganizationPicker.SelectedItem as Organization;
+            var org = OrganizationPicker.SelectedItem as Organization;
 
             try
             {
-                await _userService.CreateAdviserAsync(name, username, password, selectedOrg.Id);
+                await _userService.CreateAdviserAsync(NameEntry.Text, UsernameEntry.Text, PasswordEntry.Text, org.Id);
                 await DisplayAlert("Success", "Adviser added successfully", "OK");
 
-                // Clear form
-                NameEntry.Text = string.Empty;
-                UsernameEntry.Text = string.Empty;
-                PasswordEntry.Text = string.Empty;
+                NameEntry.Text = UsernameEntry.Text = PasswordEntry.Text = string.Empty;
                 OrganizationPicker.SelectedItem = null;
+                ClearOrganizationButton.IsVisible = false;
 
-                // Reload advisers
-                _advisers = await _userService.GetUsersByRoleAsync(UserRole.Adviser);
-                AdvisersListView.ItemsSource = _advisers;
+                await RefreshAdvisersAsync();
             }
             catch (Exception ex)
             {
@@ -88,32 +102,53 @@ namespace USJRLedger.Views.Admin
         {
             var button = sender as Button;
             var adviser = button?.BindingContext as User;
+            if (adviser == null) return;
 
-            if (adviser != null)
+            bool confirm = await DisplayAlert("Confirm",
+                $"{(adviser.IsActive ? "Deactivate" : "Activate")} {adviser.Name}?",
+                "Yes", "No");
+
+            if (!confirm) return;
+
+            try
             {
-                bool isActive = !adviser.IsActive;
-                string action = isActive ? "activate" : "deactivate";
-
-                bool confirm = await DisplayAlert("Confirm",
-                    $"Are you sure you want to {action} adviser {adviser.Name}?", "Yes", "No");
-
-                if (confirm)
-                {
-                    try
-                    {
-                        await _userService.UpdateUserStatusAsync(adviser.Id, isActive);
-                        await DisplayAlert("Success", $"Adviser {action}d successfully", "OK");
-
-                        // Reload advisers
-                        _advisers = await _userService.GetUsersByRoleAsync(UserRole.Adviser);
-                        AdvisersListView.ItemsSource = _advisers;
-                    }
-                    catch (Exception ex)
-                    {
-                        await DisplayAlert("Error", $"Failed to update adviser: {ex.Message}", "OK");
-                    }
-                }
+                await _userService.UpdateUserStatusAsync(adviser.Id, !adviser.IsActive);
+                await RefreshAdvisersAsync();
             }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Failed to update adviser: {ex.Message}", "OK");
+            }
+        }
+
+        private async void OnDeleteAdviserClicked(object sender, EventArgs e)
+        {
+            var button = sender as Button;
+            var adviser = button?.BindingContext as User;
+            if (adviser == null) return;
+
+            bool confirm = await DisplayAlert("Confirm Delete",
+                $"Are you sure you want to permanently delete adviser {adviser.Name}?",
+                "Delete", "Cancel");
+
+            if (!confirm) return;
+
+            try
+            {
+                await _userService.DeleteUserAsync(adviser.Id);
+                await DisplayAlert("Deleted", $"{adviser.Name} has been removed.", "OK");
+                await RefreshAdvisersAsync();
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Failed to delete adviser: {ex.Message}", "OK");
+            }
+        }
+
+        private void OnClearOrganizationClicked(object sender, EventArgs e)
+        {
+            OrganizationPicker.SelectedItem = null;
+            ClearOrganizationButton.IsVisible = false;
         }
     }
 }

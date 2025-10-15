@@ -20,13 +20,17 @@ namespace USJRLedger.Views.Adviser
             _organizationId = _authService.CurrentUser.OrganizationId;
 
             LoadOfficersAsync();
+
+
         }
+
 
         protected override void OnAppearing()
         {
             base.OnAppearing();
             LoadOfficersAsync();
         }
+
 
         private async Task LoadOfficersAsync()
         {
