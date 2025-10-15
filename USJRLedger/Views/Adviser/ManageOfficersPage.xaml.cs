@@ -18,19 +18,13 @@ namespace USJRLedger.Views.Adviser
             _dataService = dataService;
             _userService = new UserService(dataService);
             _organizationId = _authService.CurrentUser.OrganizationId;
-
-            LoadOfficersAsync();
-
-
         }
 
-
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
-            LoadOfficersAsync();
+            await LoadOfficersAsync();
         }
-
 
         private async Task LoadOfficersAsync()
         {
@@ -50,30 +44,30 @@ namespace USJRLedger.Views.Adviser
         {
             if (string.IsNullOrWhiteSpace(NameEntry.Text) ||
                 string.IsNullOrWhiteSpace(StudentIdEntry.Text) ||
-                string.IsNullOrWhiteSpace(PasswordEntry.Text) ||
-                string.IsNullOrWhiteSpace(PositionEntry.Text))
+                string.IsNullOrWhiteSpace(PositionEntry.Text) ||
+                string.IsNullOrWhiteSpace(PasswordEntry.Text))
             {
-                await DisplayAlert("Error", "Please fill all fields", "OK");
+                await DisplayAlert("Error", "Please fill in all fields.", "OK");
                 return;
             }
 
-            string name = NameEntry.Text;
-            string studentId = StudentIdEntry.Text;
-            string password = PasswordEntry.Text;
-            string position = PositionEntry.Text;
-
             try
             {
-                await _userService.CreateOfficerAsync(name, studentId, password, _organizationId, position);
-                await DisplayAlert("Success", "Officer added successfully", "OK");
+                await _userService.CreateOfficerAsync(
+                    NameEntry.Text,
+                    StudentIdEntry.Text,
+                    PasswordEntry.Text,
+                    _organizationId,
+                    PositionEntry.Text);
 
-                // Clear form
+                await DisplayAlert("Success", "Officer added successfully!", "OK");
+
+                // Clear fields
                 NameEntry.Text = string.Empty;
                 StudentIdEntry.Text = string.Empty;
                 PasswordEntry.Text = string.Empty;
                 PositionEntry.Text = string.Empty;
 
-                // Reload officers
                 await LoadOfficersAsync();
             }
             catch (Exception ex)
@@ -84,31 +78,51 @@ namespace USJRLedger.Views.Adviser
 
         private async void OnToggleStatusClicked(object sender, EventArgs e)
         {
-            var button = sender as Button;
-            var officer = button?.BindingContext as User;
-
-            if (officer != null)
+            if (sender is Button button && button.BindingContext is User officer)
             {
-                bool isActive = !officer.IsActive;
-                string action = isActive ? "activate" : "deactivate";
+                bool newStatus = !officer.IsActive;
+                string action = newStatus ? "activate" : "deactivate";
 
-                bool confirm = await DisplayAlert("Confirm",
-                    $"Are you sure you want to {action} officer {officer.Name}?", "Yes", "No");
+                bool confirm = await DisplayAlert("Confirm Action",
+                    $"Are you sure you want to {action} {officer.Name}?",
+                    "Yes", "No");
 
-                if (confirm)
+                if (!confirm)
+                    return;
+
+                try
                 {
-                    try
-                    {
-                        await _userService.UpdateUserStatusAsync(officer.Id, isActive);
-                        await DisplayAlert("Success", $"Officer {action}d successfully", "OK");
+                    await _userService.UpdateUserStatusAsync(officer.Id, newStatus);
+                    await DisplayAlert("Success", $"Officer {action}d successfully!", "OK");
+                    await LoadOfficersAsync();
+                }
+                catch (Exception ex)
+                {
+                    await DisplayAlert("Error", $"Failed to update officer: {ex.Message}", "OK");
+                }
+            }
+        }
 
-                        // Reload officers
-                        await LoadOfficersAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        await DisplayAlert("Error", $"Failed to update officer: {ex.Message}", "OK");
-                    }
+        private async void OnDeleteOfficerClicked(object sender, EventArgs e)
+        {
+            if (sender is Button button && button.BindingContext is User officer)
+            {
+                bool confirm = await DisplayAlert("Confirm Deletion",
+                    $"Are you sure you want to delete officer {officer.Name}?",
+                    "Yes", "No");
+
+                if (!confirm)
+                    return;
+
+                try
+                {
+                    await _userService.DeleteUserAsync(officer.Id);
+                    await DisplayAlert("Success", "Officer deleted successfully!", "OK");
+                    await LoadOfficersAsync();
+                }
+                catch (Exception ex)
+                {
+                    await DisplayAlert("Error", $"Failed to delete officer: {ex.Message}", "OK");
                 }
             }
         }

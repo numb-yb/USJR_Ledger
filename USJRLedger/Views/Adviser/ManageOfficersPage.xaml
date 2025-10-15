@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:USJRLedger.Converters"
              x:Class="USJRLedger.Views.Adviser.ManageOfficersPage"
              Title="Manage Officers">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BoolToStatusConverter x:Key="BoolToStatusConverter" />
+            <converters:BoolToActionConverter x:Key="BoolToActionConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Add Officer Section -->
             <Frame BorderColor="Gray" Padding="15">
                 <VerticalStackLayout Spacing="15">
                     <Label Text="Add New Officer" FontSize="20" FontAttributes="Bold" />
@@ -29,45 +40,77 @@
                         <Entry x:Name="PasswordEntry" Placeholder="Enter temporary password" IsPassword="True" />
                     </VerticalStackLayout>
 
-                    <Button Text="Add Officer" 
+                    <Button Text="Add Officer"
                             Clicked="OnAddOfficerClicked"
-                            HorizontalOptions="End" />
+                            HorizontalOptions="End"
+                            BackgroundColor="#6200EE"
+                            TextColor="White"
+                            CornerRadius="6" />
                 </VerticalStackLayout>
             </Frame>
 
+            <!-- Current Officers Section -->
             <Frame BorderColor="Gray" Padding="15">
                 <VerticalStackLayout Spacing="15">
                     <Label Text="Current Officers" FontSize="20" FontAttributes="Bold" />
 
-                    <ListView x:Name="OfficersListView" HasUnevenRows="True">
+                    <ListView x:Name="OfficersListView" HasUnevenRows="True" SeparatorVisibility="None">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <ViewCell>
-                                    <Frame Margin="5" Padding="10" BorderColor="Gray">
-                                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
-                                            <Label Grid.Row="0" Grid.Column="0" 
-                                                   Text="{Binding Name}" 
-                                                   FontAttributes="Bold" 
+                                    <Frame Margin="5" Padding="10" BorderColor="Gray" HasShadow="False">
+                                        <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+                                            <!-- Officer Info -->
+                                            <Label Grid.Row="0"
+                                                   Text="{Binding Name}"
+                                                   FontAttributes="Bold"
                                                    FontSize="16" />
 
-                                            <Label Grid.Row="1" Grid.Column="0" 
-                                                   Text="{Binding Position}" 
-                                                   FontSize="14" />
+                                            <Label Grid.Row="1"
+                                                   Text="{Binding Position}"
+                                                   FontSize="14"
+                                                   TextColor="Gray" />
 
-                                            <StackLayout Grid.Row="2" Grid.Column="0" 
-                                                         Orientation="Horizontal" 
+                                            <StackLayout Grid.Row="2"
+                                                         Orientation="Horizontal"
                                                          Spacing="5">
                                                 <Label Text="Status:" FontAttributes="Bold" />
                                                 <Label Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" />
                                             </StackLayout>
 
-                                            <Button Grid.Row="0" Grid.Column="1" 
-                                                    Grid.RowSpan="3" 
-                                                    VerticalOptions="Center"
-                                                    Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
-                                                    BackgroundColor="{Binding IsActive, StringFormat='Red;Green'}"
-                                                    BindingContext="{Binding .}"
-                                                    Clicked="OnToggleStatusClicked" />
+                                            <!-- Responsive Buttons -->
+                                            <StackLayout Grid.Row="3"
+                                                         Orientation="Horizontal"
+                                                         Spacing="10"
+                                                         HorizontalOptions="End">
+                                                <StackLayout.Triggers>
+                                                    <!-- Stack buttons vertically on narrow screens -->
+                                                    <DataTrigger TargetType="StackLayout"
+                                                                 Binding="{Binding Source={x:Reference OfficersListView}, Path=Width}"
+                                                                 Value="400">
+                                                        <Setter Property="Orientation" Value="Vertical" />
+                                                        <Setter Property="HorizontalOptions" Value="Fill" />
+                                                    </DataTrigger>
+                                                </StackLayout.Triggers>
+
+                                                <!-- Toggle Button -->
+                                                <Button Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
+                                                        BackgroundColor="#2196F3"
+                                                        TextColor="White"
+                                                        CornerRadius="6"
+                                                        HeightRequest="35"
+                                                        BindingContext="{Binding .}"
+                                                        Clicked="OnToggleStatusClicked" />
+
+                                                <!-- Delete Button -->
+                                                <Button Text="Delete"
+                                                        BackgroundColor="#D32F2F"
+                                                        TextColor="White"
+                                                        CornerRadius="6"
+                                                        HeightRequest="35"
+                                                        BindingContext="{Binding .}"
+                                                        Clicked="OnDeleteOfficerClicked" />
+                                            </StackLayout>
                                         </Grid>
                                     </Frame>
                                 </ViewCell>

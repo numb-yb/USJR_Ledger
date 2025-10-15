@@ -4,18 +4,18 @@ using Microsoft.Maui.Controls;
 
 namespace USJRLedger.Converters
 {
-    public class BoolToStatusConverter : IValueConverter
+    public class BoolToStatusColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool isActive)
-                return isActive ? "Active" : "Inactive";
-            return "Unknown";
+                return isActive ? Colors.Green : Colors.Red;
+            return Colors.Gray;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value?.ToString() == "Active";
+            throw new NotImplementedException();
         }
     }
 }
