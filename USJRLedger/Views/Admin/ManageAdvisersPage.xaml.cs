@@ -38,7 +38,7 @@ namespace USJRLedger.Views.Admin
             try
             {
                 var advisers = await _userService.GetUsersByRoleAsync(UserRole.Adviser);
-                AdvisersListView.ItemsSource = advisers;
+                AdvisersCollectionView.ItemsSource = advisers;
             }
             catch (Exception ex)
             {
@@ -83,23 +83,18 @@ namespace USJRLedger.Views.Admin
 
         private async void OnToggleStatusClicked(object sender, EventArgs e)
         {
-            var button = sender as Button;
-            var adviser = button?.BindingContext as User;
-
+            var adviser = (sender as Button)?.BindingContext as User;
             if (adviser == null) return;
 
-            bool isActive = !adviser.IsActive;
-            string action = isActive ? "activate" : "deactivate";
+            bool newStatus = !adviser.IsActive;
+            string action = newStatus ? "activate" : "deactivate";
 
-            bool confirm = await DisplayAlert("Confirm Action",
-                $"Are you sure you want to {action} {adviser.Name}?",
-                "Yes", "No");
-
-            if (!confirm) return;
+            if (!await DisplayAlert("Confirm", $"Are you sure you want to {action} {adviser.Name}?", "Yes", "No"))
+                return;
 
             try
             {
-                await _userService.UpdateUserStatusAsync(adviser.Id, isActive);
+                await _userService.UpdateUserStatusAsync(adviser.Id, newStatus);
                 await DisplayAlert("Success", $"Adviser {action}d successfully!", "OK");
                 await LoadAdvisersAsync();
             }
@@ -111,21 +106,19 @@ namespace USJRLedger.Views.Admin
 
         private async void OnDeleteAdviserClicked(object sender, EventArgs e)
         {
-            var button = sender as Button;
-            var adviser = button?.BindingContext as User;
-
+            var adviser = (sender as Button)?.BindingContext as User;
             if (adviser == null) return;
 
-            bool confirm = await DisplayAlert("Confirm Delete",
-                $"Are you sure you want to delete adviser {adviser.Name}?",
-                "Yes", "No");
-
-            if (!confirm) return;
+            if (!await DisplayAlert("Confirm Delete",
+                $"Delete adviser {adviser.Name}?", "Yes", "No")) return;
 
             try
             {
                 await _userService.DeleteUserAsync(adviser.Id);
-                await DisplayAlert("Success", "Adviser deleted successfully!", "OK");
+                await DisplayAlert("Deleted", "Adviser removed successfully!", "OK");
+
+                // Avoid ObjectDisposedException by delaying UI update slightly
+                await Task.Delay(200);
                 await LoadAdvisersAsync();
             }
             catch (Exception ex)
