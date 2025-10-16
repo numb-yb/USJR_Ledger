@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
@@ -24,77 +23,58 @@ namespace USJRLedger.Views.Adviser
 
         private Organization _organization;
         private SchoolYear _currentSchoolYear;
-
-        private CancellationTokenSource _loadCts;
-        private bool _isActive;
+        private bool _isVisible;
 
         public AdviserDashboardPage(AuthService authService)
         {
             InitializeComponent();
             _authService = authService;
             _dataService = new DataService();
-
             WelcomeLabel.Text = $"Welcome, {_authService.CurrentUser?.Name ?? "User"}";
         }
 
-        protected override async void OnAppearing()
+        protected override void OnAppearing()
         {
             base.OnAppearing();
-            _isActive = true;
+            _isVisible = true;
 
-            await SafeReloadAsync();
+            //Subscribe to officer change messages
+            MessagingCenter.Subscribe<ManageOfficersPage>(this, "OfficersChanged", async (sender) =>
+            {
+                await Task.Delay(150); // allow UI teardown to finish
+                if (_isVisible)
+                    await LoadDashboardAsync();
+            });
+
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(100);
+                if (_isVisible)
+                    await LoadDashboardAsync();
+            });
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-            _isActive = false;
+            _isVisible = false;
 
-            CancelLoad();
+            //Unsubscribe when not visible
+            MessagingCenter.Unsubscribe<ManageOfficersPage>(this, "OfficersChanged");
         }
 
-        private void CancelLoad()
+        private async Task LoadDashboardAsync()
         {
             try
             {
-                if (_loadCts != null)
-                {
-                    _loadCts.Cancel();
-                    _loadCts.Dispose();
-                    _loadCts = null;
-                }
-            }
-            catch { /* ignore */ }
-        }
+                if (!_isVisible) return;
 
-        private async Task SafeReloadAsync()
-        {
-            CancelLoad();
-            _loadCts = new CancellationTokenSource();
-
-            try
-            {
-                await LoadDataAsync(_loadCts.Token);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[Dashboard Load Error] {ex}");
-            }
-        }
-
-        private async Task LoadDataAsync(CancellationToken ct)
-        {
-            try
-            {
                 var orgs = await _dataService.LoadFromFileAsync<Organization>("organizations.json");
                 _organization = orgs.FirstOrDefault(o => o.Id == _authService.CurrentUser.OrganizationId);
 
-                if (ct.IsCancellationRequested || !_isActive)
-                    return;
-
                 if (_organization == null)
                 {
-                    await UpdateUIAsync(() =>
+                    MainThread.BeginInvokeOnMainThread(() =>
                     {
                         OrganizationLabel.Text = "No Organization Assigned";
                         SchoolYearStatusLabel.Text = "N/A";
@@ -140,12 +120,12 @@ namespace USJRLedger.Views.Adviser
                     })
                     .ToList();
 
-                if (ct.IsCancellationRequested || !_isActive)
-                    return;
+                if (!_isVisible) return;
 
-                await UpdateUIAsync(() =>
+                // Safely update UI on main thread
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    if (!_isActive) return;
+                    if (!_isVisible) return;
 
                     OrganizationLabel.Text = $"Organization: {_organization.Name} ({_organization.Department})";
                     SchoolYearStatusLabel.Text = _currentSchoolYear != null
@@ -159,28 +139,11 @@ namespace USJRLedger.Views.Adviser
                     NotificationListView.ItemsSource = notifications;
                 });
             }
-            catch (OperationCanceledException) { }
-            catch (ObjectDisposedException) { }
             catch (Exception ex)
             {
-                if (_isActive)
+                if (_isVisible)
                     await DisplayAlert("Error", $"Failed to load dashboard: {ex.Message}", "OK");
             }
-        }
-
-        private async Task UpdateUIAsync(Action action)
-        {
-            if (!_isActive) return;
-
-            try
-            {
-                await MainThread.InvokeOnMainThreadAsync(() =>
-                {
-                    if (_isActive)
-                        action?.Invoke();
-                });
-            }
-            catch (ObjectDisposedException) { }
         }
 
         #region Navigation
@@ -202,12 +165,6 @@ namespace USJRLedger.Views.Adviser
             }
 
             var page = new ManageOfficersPage(_authService, _dataService);
-            page.Disappearing += async (_, _) =>
-            {
-                if (_isActive)
-                    await SafeReloadAsync();
-            };
-
             await Navigation.PushAsync(page);
         }
 

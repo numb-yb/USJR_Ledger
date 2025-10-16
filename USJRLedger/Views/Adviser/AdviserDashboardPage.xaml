@@ -57,28 +57,40 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" StrokeShape="RoundRectangle 6">
+            <Border Grid.Column="0" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="6" />
+                </Border.StrokeShape>
                 <VerticalStackLayout>
                     <Label Text="Current Balance" FontSize="16" FontAttributes="Bold" />
                     <Label x:Name="BalanceLabel" FontSize="20" TextColor="Green" />
                 </VerticalStackLayout>
             </Border>
 
-            <Border Grid.Column="1" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" StrokeShape="RoundRectangle 6">
+            <Border Grid.Column="1" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="6" />
+                </Border.StrokeShape>
                 <VerticalStackLayout>
                     <Label Text="Pending Expenses" FontSize="16" FontAttributes="Bold" />
                     <Label x:Name="PendingExpensesLabel" FontSize="20" TextColor="Orange" />
                 </VerticalStackLayout>
             </Border>
 
-            <Border Grid.Column="2" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" StrokeShape="RoundRectangle 6">
+            <Border Grid.Column="2" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="6" />
+                </Border.StrokeShape>
                 <VerticalStackLayout>
                     <Label Text="Pending Income" FontSize="16" FontAttributes="Bold" />
                     <Label x:Name="PendingIncomeLabel" FontSize="20" TextColor="Green" />
                 </VerticalStackLayout>
             </Border>
 
-            <Border Grid.Column="3" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" StrokeShape="RoundRectangle 6">
+            <Border Grid.Column="3" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="6" />
+                </Border.StrokeShape>
                 <VerticalStackLayout>
                     <Label Text="School Year Status" FontSize="16" FontAttributes="Bold" />
                     <Label x:Name="SchoolYearStatusLabel" FontSize="20" />
@@ -87,13 +99,19 @@
         </Grid>
 
         <!-- Notifications (CollectionView + Border items) -->
-        <Border Grid.Row="2" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="0" StrokeShape="RoundRectangle 6">
+        <Border Grid.Row="2" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="6" />
+            </Border.StrokeShape>
             <VerticalStackLayout>
                 <Label Text="Notifications" FontSize="20" FontAttributes="Bold" Margin="0,0,0,10" />
                 <CollectionView x:Name="NotificationListView" SelectionMode="None" EmptyView="No pending requests.">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border Stroke="LightGray" StrokeThickness="1" Padding="10" Margin="4" StrokeShape="RoundRectangle 6">
+                            <Border Stroke="LightGray" StrokeThickness="1" Padding="10" Margin="4">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="6" />
+                                </Border.StrokeShape>
                                 <VerticalStackLayout>
                                     <Label Text="{Binding Detail}" FontAttributes="Bold" />
                                     <Label Text="{Binding DateString}" FontSize="12" TextColor="Gray" />

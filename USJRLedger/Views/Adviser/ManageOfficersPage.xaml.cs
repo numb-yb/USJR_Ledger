@@ -1,5 +1,6 @@
 using USJRLedger.Models;
 using USJRLedger.Services;
+using Microsoft.Maui.Controls;
 
 namespace USJRLedger.Views.Adviser
 {
@@ -62,6 +63,9 @@ namespace USJRLedger.Views.Adviser
 
                 await DisplayAlert("Success", "Officer added successfully!", "OK");
 
+                // Notify dashboard that officers changed
+                MessagingCenter.Send(this, "OfficersChanged");
+
                 // Clear fields
                 NameEntry.Text = string.Empty;
                 StudentIdEntry.Text = string.Empty;
@@ -94,6 +98,10 @@ namespace USJRLedger.Views.Adviser
                 {
                     await _userService.UpdateUserStatusAsync(officer.Id, newStatus);
                     await DisplayAlert("Success", $"Officer {action}d successfully!", "OK");
+
+                    // Notify dashboard in case totals or roles change
+                    MessagingCenter.Send(this, "OfficersChanged");
+
                     await LoadOfficersAsync();
                 }
                 catch (Exception ex)
@@ -118,6 +126,10 @@ namespace USJRLedger.Views.Adviser
                 {
                     await _userService.DeleteUserAsync(officer.Id);
                     await DisplayAlert("Success", "Officer deleted successfully!", "OK");
+
+                    //Notify dashboard so it refreshes safely
+                    MessagingCenter.Send(this, "OfficersChanged");
+
                     await LoadOfficersAsync();
                 }
                 catch (Exception ex)

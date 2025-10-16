@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:USJRLedger.Converters"
              x:Class="USJRLedger.Views.Adviser.SchoolYearPage"
              Title="School Year Management">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BoolToActiveTextConverter x:Key="BoolToActiveTextConverter" />
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Current School Year Section -->
             <Frame BorderColor="Gray" Padding="15">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Current School Year" FontSize="20" FontAttributes="Bold" />
@@ -17,23 +28,29 @@
                         <Label Grid.Row="1" Grid.Column="1" x:Name="StartDateLabel" />
                     </Grid>
 
+                    <!-- End School Year button - now red -->
                     <Button x:Name="EndSchoolYearButton" 
                             Text="End School Year" 
-                            BackgroundColor="Orange" 
+                            BackgroundColor="#D32F2F" 
+                            TextColor="White"
+                            CornerRadius="6"
                             Clicked="OnEndSchoolYearClicked"
                             IsVisible="False" />
                 </VerticalStackLayout>
             </Frame>
 
+            <!-- Start New School Year Section -->
             <Frame BorderColor="Gray" Padding="15" x:Name="StartNewYearFrame">
                 <VerticalStackLayout Spacing="15">
                     <Label Text="Start New School Year" FontSize="20" FontAttributes="Bold" />
 
+                    <!-- Semester Input -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Semester" />
                         <Entry x:Name="SemesterEntry" Placeholder="Enter semester (e.g. First, Second)" />
                     </VerticalStackLayout>
 
+                    <!-- Year Input -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Year" />
                         <Entry x:Name="YearEntry" Placeholder="Enter year (e.g. 2024-2025)" />
@@ -41,11 +58,15 @@
 
                     <Button x:Name="StartSchoolYearButton" 
                             Text="Start School Year" 
-                            Clicked="OnStartSchoolYearClicked"
-                            HorizontalOptions="End" />
+                            BackgroundColor="#4CAF50"
+                            TextColor="White"
+                            CornerRadius="6"
+                            HorizontalOptions="End"
+                            Clicked="OnStartSchoolYearClicked" />
                 </VerticalStackLayout>
             </Frame>
 
+            <!-- School Year History Section -->
             <Frame BorderColor="Gray" Padding="15">
                 <VerticalStackLayout Spacing="15">
                     <Label Text="School Year History" FontSize="20" FontAttributes="Bold" />
@@ -71,11 +92,12 @@
                                             <Label Text="{Binding EndDate, StringFormat='{0:MMM dd, yyyy}'}" FontSize="12" />
                                         </StackLayout>
 
+                                        <!-- Uses converters instead of True/False -->
                                         <Label Grid.Row="0" Grid.Column="1" 
                                                Grid.RowSpan="3" 
                                                VerticalOptions="Center"
-                                               Text="{Binding IsActive, StringFormat='{0:Active;Inactive}'}"
-                                               TextColor="{Binding IsActive, StringFormat='{0:Green;Gray}'}"
+                                               Text="{Binding IsActive, Converter={StaticResource BoolToActiveTextConverter}}"
+                                               TextColor="{Binding IsActive, Converter={StaticResource BoolToColorConverter}}"
                                                FontAttributes="Bold" />
                                     </Grid>
                                 </ViewCell>

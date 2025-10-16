@@ -16,7 +16,7 @@
         <VerticalStackLayout Padding="20" Spacing="20">
 
             <!-- Add Officer Section -->
-            <Frame BorderColor="Gray" Padding="15">
+            <Border Stroke="Gray" StrokeThickness="1" Padding="15" StrokeShape="RoundRectangle 8" Margin="0,0,0,10">
                 <VerticalStackLayout Spacing="15">
                     <Label Text="Add New Officer" FontSize="20" FontAttributes="Bold" />
 
@@ -47,10 +47,10 @@
                             TextColor="White"
                             CornerRadius="6" />
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Current Officers Section -->
-            <Frame BorderColor="Gray" Padding="15">
+            <Border Stroke="Gray" StrokeThickness="1" Padding="15" StrokeShape="RoundRectangle 8">
                 <VerticalStackLayout Spacing="15">
                     <Label Text="Current Officers" FontSize="20" FontAttributes="Bold" />
 
@@ -58,9 +58,9 @@
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <ViewCell>
-                                    <Frame Margin="5" Padding="10" BorderColor="Gray" HasShadow="False">
+                                    <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" StrokeShape="RoundRectangle 8">
                                         <Grid RowDefinitions="Auto,Auto,Auto,Auto">
-                                            <!-- Officer Info -->
+
                                             <Label Grid.Row="0"
                                                    Text="{Binding Name}"
                                                    FontAttributes="Bold"
@@ -71,29 +71,12 @@
                                                    FontSize="14"
                                                    TextColor="Gray" />
 
-                                            <StackLayout Grid.Row="2"
-                                                         Orientation="Horizontal"
-                                                         Spacing="5">
+                                            <StackLayout Grid.Row="2" Orientation="Horizontal" Spacing="5">
                                                 <Label Text="Status:" FontAttributes="Bold" />
                                                 <Label Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" />
                                             </StackLayout>
 
-                                            <!-- Responsive Buttons -->
-                                            <StackLayout Grid.Row="3"
-                                                         Orientation="Horizontal"
-                                                         Spacing="10"
-                                                         HorizontalOptions="End">
-                                                <StackLayout.Triggers>
-                                                    <!-- Stack buttons vertically on narrow screens -->
-                                                    <DataTrigger TargetType="StackLayout"
-                                                                 Binding="{Binding Source={x:Reference OfficersListView}, Path=Width}"
-                                                                 Value="400">
-                                                        <Setter Property="Orientation" Value="Vertical" />
-                                                        <Setter Property="HorizontalOptions" Value="Fill" />
-                                                    </DataTrigger>
-                                                </StackLayout.Triggers>
-
-                                                <!-- Toggle Button -->
+                                            <StackLayout Grid.Row="3" Orientation="Horizontal" Spacing="10" HorizontalOptions="End">
                                                 <Button Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
                                                         BackgroundColor="#2196F3"
                                                         TextColor="White"
@@ -102,7 +85,6 @@
                                                         BindingContext="{Binding .}"
                                                         Clicked="OnToggleStatusClicked" />
 
-                                                <!-- Delete Button -->
                                                 <Button Text="Delete"
                                                         BackgroundColor="#D32F2F"
                                                         TextColor="White"
@@ -112,13 +94,13 @@
                                                         Clicked="OnDeleteOfficerClicked" />
                                             </StackLayout>
                                         </Grid>
-                                    </Frame>
+                                    </Border>
                                 </ViewCell>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
