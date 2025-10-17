@@ -138,7 +138,7 @@
                TextColor="#333"
                HorizontalOptions="Start" />
 
-                    <!-- Notification list container with limited height -->
+                    <!-- Scrollable list with limited height -->
                     <ScrollView HeightRequest="{OnPlatform Android=250, iOS=250, WinUI=300}"
                     VerticalOptions="Start"
                     BackgroundColor="Transparent">
@@ -149,13 +149,13 @@
                             Margin="0,5,0,0">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Stroke="#ddd" StrokeThickness="1" Padding="10" Margin="4"
-                                BackgroundColor="White"
-                                Shadow="{OnPlatform Android='1,1,2,0.3', iOS='1,1,2,0.3'}">
-                                        <Border.StrokeShape>
-                                            <RoundRectangle CornerRadius="8" />
-                                        </Border.StrokeShape>
-
+                                    <!-- Individual notification card -->
+                                    <Frame HasShadow="True"
+                               CornerRadius="8"
+                               Padding="10"
+                               Margin="4"
+                               BackgroundColor="White"
+                               BorderColor="#ddd">
                                         <VerticalStackLayout>
                                             <Label Text="{Binding Detail}"
                                        FontSize="14"
@@ -165,13 +165,14 @@
                                        FontSize="12"
                                        TextColor="Gray" />
                                         </VerticalStackLayout>
-                                    </Border>
+                                    </Frame>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
                     </ScrollView>
                 </VerticalStackLayout>
             </Border>
+
 
         </VerticalStackLayout>
     </ScrollView>
