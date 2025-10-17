@@ -205,7 +205,80 @@ namespace USJRLedger.Views.Adviser
             _authService.Logout();
             Application.Current.MainPage = new NavigationPage(new LoginPage(_authService));
         }
+        protected override void OnSizeAllocated(double width, double height)
+        {
+            base.OnSizeAllocated(width, height);
+
+            if (SummaryGrid == null || SummaryGrid.Children.Count < 4)
+                return;
+
+            // Clear layout structure before rebuilding
+            SummaryGrid.RowDefinitions.Clear();
+            SummaryGrid.ColumnDefinitions.Clear();
+
+            // Adjust card sizing to prevent overflow in portrait
+            double cardWidth = width > height ? width / 4.5 : width / 2.2;
+
+            if (width > height)
+            {
+                // Landscape: 1 row, 4 columns
+                SummaryGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                for (int i = 0; i < 4; i++)
+                    SummaryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+
+                for (int i = 0; i < 4; i++)
+                {
+                    if (SummaryGrid.Children[i] is Border border)
+                    {
+                        border.WidthRequest = cardWidth;
+                        border.HeightRequest = -1; // Auto height
+                    }
+
+                    SummaryGrid.SetRow(SummaryGrid.Children[i], 0);
+                    SummaryGrid.SetColumn(SummaryGrid.Children[i], i);
+                }
+            }
+            else
+            {
+                // Portrait: 2x2 grid
+                for (int i = 0; i < 2; i++)
+                    SummaryGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                for (int i = 0; i < 2; i++)
+                    SummaryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+
+                for (int i = 0; i < 4; i++)
+                {
+                    if (SummaryGrid.Children[i] is Border border)
+                    {
+                        border.WidthRequest = cardWidth;
+                        border.HeightRequest = -1;
+                    }
+                }
+
+                SummaryGrid.SetRow(SummaryGrid.Children[0], 0);
+                SummaryGrid.SetColumn(SummaryGrid.Children[0], 0);
+
+                SummaryGrid.SetRow(SummaryGrid.Children[1], 0);
+                SummaryGrid.SetColumn(SummaryGrid.Children[1], 1);
+
+                SummaryGrid.SetRow(SummaryGrid.Children[2], 1);
+                SummaryGrid.SetColumn(SummaryGrid.Children[2], 0);
+
+                SummaryGrid.SetRow(SummaryGrid.Children[3], 1);
+                SummaryGrid.SetColumn(SummaryGrid.Children[3], 1);
+            }
+
+            // Safe MAUI-compatible way to force re-layout
+            SummaryGrid.Dispatcher.Dispatch(() =>
+            {
+                SummaryGrid.WidthRequest = SummaryGrid.WidthRequest + 0.01;
+                SummaryGrid.WidthRequest = -1;
+            });
+        }
+
+
+
 
         #endregion
     }
-}
+}   

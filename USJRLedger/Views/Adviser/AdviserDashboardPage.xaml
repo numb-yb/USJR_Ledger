@@ -2,25 +2,36 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="USJRLedger.Views.Adviser.AdviserDashboardPage"
-             Title="Adviser Dashboard">
+             Title="Adviser Dashboard"
+             BackgroundColor="White">
 
-    <Grid Padding="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <!-- Outer scroll for portrait support -->
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
 
-        <!-- Header -->
-        <VerticalStackLayout Grid.Row="0" Spacing="20" Margin="0,0,0,20">
-            <Label x:Name="WelcomeLabel" FontSize="24" FontAttributes="Bold" />
-            <Label x:Name="OrganizationLabel" FontSize="18" FontAttributes="Bold" />
+            <!-- HEADER -->
+            <VerticalStackLayout>
+                <Label x:Name="WelcomeLabel"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="#333"
+                       Text="Welcome, User" />
 
-            <!-- Navigation Buttons -->
-            <Grid x:Name="ButtonGrid">
+                <Label x:Name="OrganizationLabel"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="#666"
+                       Text="Organization: Loading..." />
+            </VerticalStackLayout>
+
+            <!-- NAVIGATION BUTTONS -->
+            <Grid x:Name="ButtonGrid"
+                  ColumnSpacing="6"
+                  RowSpacing="6"
+                  HorizontalOptions="FillAndExpand">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -29,98 +40,139 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Text="View Organization" Clicked="OnViewOrgProfileClicked"
-                        Grid.Row="0" Grid.Column="0" Margin="6,4" FontSize="14" CornerRadius="8" />
-                <Button Text="Manage Officers" Clicked="OnManageOfficersClicked"
-                        Grid.Row="0" Grid.Column="1" Margin="6,4" FontSize="14" CornerRadius="8" />
-                <Button Text="School Year" Clicked="OnSchoolYearClicked"
-                        Grid.Row="0" Grid.Column="2" Margin="6,4" FontSize="14" CornerRadius="8" />
-                <Button Text="Expense Requests" Clicked="OnExpenseRequestsClicked"
-                        Grid.Row="0" Grid.Column="3" Margin="6,4" FontSize="14" CornerRadius="8" />
-                <Button Text="Income Requests" Clicked="OnIncomeRequestsClicked"
-                        Grid.Row="1" Grid.Column="0" Margin="6,4" FontSize="14" CornerRadius="8" />
-                <Button Text="Events" Clicked="OnEventsClicked"
-                        Grid.Row="1" Grid.Column="1" Margin="6,4" FontSize="14" CornerRadius="8" />
-                <Button Text="Logout" Clicked="OnLogoutClicked"
-                        Grid.Row="1" Grid.Column="2" Margin="6,4"
-                        FontSize="14" CornerRadius="8"
+                <Button Text="View Organization" Grid.Row="0" Grid.Column="0"
+                        Clicked="OnViewOrgProfileClicked" FontSize="14" CornerRadius="8" />
+                <Button Text="Manage Officers" Grid.Row="0" Grid.Column="1"
+                        Clicked="OnManageOfficersClicked" FontSize="14" CornerRadius="8" />
+                <Button Text="School Year" Grid.Row="0" Grid.Column="2"
+                        Clicked="OnSchoolYearClicked" FontSize="14" CornerRadius="8" />
+                <Button Text="Expense Requests" Grid.Row="0" Grid.Column="3"
+                        Clicked="OnExpenseRequestsClicked" FontSize="14" CornerRadius="8" />
+                <Button Text="Income Requests" Grid.Row="1" Grid.Column="0"
+                        Clicked="OnIncomeRequestsClicked" FontSize="14" CornerRadius="8" />
+                <Button Text="Events" Grid.Row="1" Grid.Column="1"
+                        Clicked="OnEventsClicked" FontSize="14" CornerRadius="8" />
+                <Button Text="Logout" Grid.Row="1" Grid.Column="2"
+                        Clicked="OnLogoutClicked" FontSize="14" CornerRadius="8"
                         BackgroundColor="DarkRed" TextColor="White" />
             </Grid>
+
+            <!-- SUMMARY GRID (auto layout on rotation) -->
+            <Grid x:Name="SummaryGrid"
+                  Margin="0,10,0,10"
+                  ColumnSpacing="10"
+                  RowSpacing="10"
+                  HorizontalOptions="FillAndExpand">
+
+                <!-- CARD 1 -->
+                <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" BackgroundColor="#fafafa">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="Current Balance" FontSize="16" FontAttributes="Bold" />
+                        <Label x:Name="BalanceLabel"
+                               Text="₱0.00"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="Green" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- CARD 2 -->
+                <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" BackgroundColor="#fafafa">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="Pending Expenses" FontSize="16" FontAttributes="Bold" />
+                        <Label x:Name="PendingExpensesLabel"
+                               Text="0"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="Orange" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- CARD 3 -->
+                <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" BackgroundColor="#fafafa">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="Pending Income" FontSize="16" FontAttributes="Bold" />
+                        <Label x:Name="PendingIncomeLabel"
+                               Text="0"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="Green" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- CARD 4 -->
+                <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" BackgroundColor="#fafafa">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="School Year Status" FontSize="16" FontAttributes="Bold" />
+                        <Label x:Name="SchoolYearStatusLabel"
+                               Text="Loading..."
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="Gray" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- NOTIFICATIONS -->
+            <Border Stroke="Gray" StrokeThickness="1" Padding="10" BackgroundColor="#fafafa" Margin="0,10,0,20">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Notifications"
+               FontSize="20"
+               FontAttributes="Bold"
+               TextColor="#333"
+               HorizontalOptions="Start" />
+
+                    <!-- Notification list container with limited height -->
+                    <ScrollView HeightRequest="{OnPlatform Android=250, iOS=250, WinUI=300}"
+                    VerticalOptions="Start"
+                    BackgroundColor="Transparent">
+                        <CollectionView x:Name="NotificationListView"
+                            SelectionMode="None"
+                            EmptyView="No pending requests."
+                            VerticalOptions="Start"
+                            Margin="0,5,0,0">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Stroke="#ddd" StrokeThickness="1" Padding="10" Margin="4"
+                                BackgroundColor="White"
+                                Shadow="{OnPlatform Android='1,1,2,0.3', iOS='1,1,2,0.3'}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8" />
+                                        </Border.StrokeShape>
+
+                                        <VerticalStackLayout>
+                                            <Label Text="{Binding Detail}"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       TextColor="#333" />
+                                            <Label Text="{Binding DateString}"
+                                       FontSize="12"
+                                       TextColor="Gray" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </ScrollView>
+                </VerticalStackLayout>
+            </Border>
+
         </VerticalStackLayout>
-
-        <!-- Summary Section using Border instead of Frame -->
-        <Grid Grid.Row="1" Margin="0,10,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Border Grid.Column="0" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="6" />
-                </Border.StrokeShape>
-                <VerticalStackLayout>
-                    <Label Text="Current Balance" FontSize="16" FontAttributes="Bold" />
-                    <Label x:Name="BalanceLabel" FontSize="20" TextColor="Green" />
-                </VerticalStackLayout>
-            </Border>
-
-            <Border Grid.Column="1" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="6" />
-                </Border.StrokeShape>
-                <VerticalStackLayout>
-                    <Label Text="Pending Expenses" FontSize="16" FontAttributes="Bold" />
-                    <Label x:Name="PendingExpensesLabel" FontSize="20" TextColor="Orange" />
-                </VerticalStackLayout>
-            </Border>
-
-            <Border Grid.Column="2" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="6" />
-                </Border.StrokeShape>
-                <VerticalStackLayout>
-                    <Label Text="Pending Income" FontSize="16" FontAttributes="Bold" />
-                    <Label x:Name="PendingIncomeLabel" FontSize="20" TextColor="Green" />
-                </VerticalStackLayout>
-            </Border>
-
-            <Border Grid.Column="3" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="6" />
-                </Border.StrokeShape>
-                <VerticalStackLayout>
-                    <Label Text="School Year Status" FontSize="16" FontAttributes="Bold" />
-                    <Label x:Name="SchoolYearStatusLabel" FontSize="20" />
-                </VerticalStackLayout>
-            </Border>
-        </Grid>
-
-        <!-- Notifications (CollectionView + Border items) -->
-        <Border Grid.Row="2" Stroke="Gray" StrokeThickness="1" Padding="10" Margin="0">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="6" />
-            </Border.StrokeShape>
-            <VerticalStackLayout>
-                <Label Text="Notifications" FontSize="20" FontAttributes="Bold" Margin="0,0,0,10" />
-                <CollectionView x:Name="NotificationListView" SelectionMode="None" EmptyView="No pending requests.">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Stroke="LightGray" StrokeThickness="1" Padding="10" Margin="4">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="6" />
-                                </Border.StrokeShape>
-                                <VerticalStackLayout>
-                                    <Label Text="{Binding Detail}" FontAttributes="Bold" />
-                                    <Label Text="{Binding DateString}" FontSize="12" TextColor="Gray" />
-                                </VerticalStackLayout>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </VerticalStackLayout>
-        </Border>
-    </Grid>
+    </ScrollView>
 </ContentPage>
