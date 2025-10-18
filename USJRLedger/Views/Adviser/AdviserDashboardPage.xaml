@@ -1,179 +1,187 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="USJRLedger.Views.Adviser.AdviserDashboardPage"
-             Title="Adviser Dashboard"
-             BackgroundColor="White">
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:USJRLedger.Converters"
+    x:Class="USJRLedger.Views.Adviser.AdviserDashboardPage"
+    Title="Adviser Dashboard">
 
-    <!-- Outer scroll for portrait support -->
+    <!--  Resource dictionary: register the color converter -->
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BalanceColorConverter x:Key="BalanceColorConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
-            <!-- HEADER -->
-            <VerticalStackLayout>
-                <Label x:Name="WelcomeLabel"
-                       FontSize="24"
-                       FontAttributes="Bold"
-                       TextColor="#333"
-                       Text="Welcome, User" />
+            <!-- Welcome message -->
+            <Label x:Name="WelcomeLabel"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="Black"
+                   HorizontalOptions="Center" />
 
-                <Label x:Name="OrganizationLabel"
-                       FontSize="18"
-                       FontAttributes="Bold"
-                       TextColor="#666"
-                       Text="Organization: Loading..." />
-            </VerticalStackLayout>
+            <!-- Organization and school year info -->
+            <Label x:Name="OrganizationLabel"
+                   FontSize="16"
+                   TextColor="Gray"
+                   HorizontalOptions="Center" />
 
-            <!-- NAVIGATION BUTTONS -->
-            <Grid x:Name="ButtonGrid"
-                  ColumnSpacing="6"
-                  RowSpacing="6"
-                  HorizontalOptions="FillAndExpand">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <Label x:Name="SchoolYearStatusLabel"
+                   FontSize="16"
+                   FontAttributes="Italic"
+                   HorizontalOptions="Center" />
 
-                <Button Text="View Organization" Grid.Row="0" Grid.Column="0"
-                        Clicked="OnViewOrgProfileClicked" FontSize="14" CornerRadius="8" />
-                <Button Text="Manage Officers" Grid.Row="0" Grid.Column="1"
-                        Clicked="OnManageOfficersClicked" FontSize="14" CornerRadius="8" />
-                <Button Text="School Year" Grid.Row="0" Grid.Column="2"
-                        Clicked="OnSchoolYearClicked" FontSize="14" CornerRadius="8" />
-                <Button Text="Expense Requests" Grid.Row="0" Grid.Column="3"
-                        Clicked="OnExpenseRequestsClicked" FontSize="14" CornerRadius="8" />
-                <Button Text="Income Requests" Grid.Row="1" Grid.Column="0"
-                        Clicked="OnIncomeRequestsClicked" FontSize="14" CornerRadius="8" />
-                <Button Text="Events" Grid.Row="1" Grid.Column="1"
-                        Clicked="OnEventsClicked" FontSize="14" CornerRadius="8" />
-                <Button Text="Logout" Grid.Row="1" Grid.Column="2"
-                        Clicked="OnLogoutClicked" FontSize="14" CornerRadius="8"
-                        BackgroundColor="DarkRed" TextColor="White" />
-            </Grid>
-
-            <!-- SUMMARY GRID (auto layout on rotation) -->
+            <!-- Summary Grid (Balances, Pending, etc.) -->
             <Grid x:Name="SummaryGrid"
-                  Margin="0,10,0,10"
                   ColumnSpacing="10"
                   RowSpacing="10"
-                  HorizontalOptions="FillAndExpand">
+                  HorizontalOptions="Center"
+                  VerticalOptions="Center">
 
-                <!-- CARD 1 -->
-                <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" BackgroundColor="#fafafa">
+                <!-- CARD 1: Current Balance -->
+                <Border Stroke="Gray"
+                        StrokeThickness="1"
+                        Padding="10"
+                        Margin="5"
+                        BackgroundColor="#fafafa">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="10" />
                     </Border.StrokeShape>
-                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-                        <Label Text="Current Balance" FontSize="16" FontAttributes="Bold" />
+
+                    <VerticalStackLayout
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center">
+                        <Label Text="Current Balance"
+                               FontSize="16"
+                               FontAttributes="Bold" />
                         <Label x:Name="BalanceLabel"
-                               Text="₱0.00"
                                FontSize="20"
                                FontAttributes="Bold"
-                               TextColor="Green" />
+                               Text="{Binding CurrentBalance, StringFormat='₱{0:N2}'}"
+                               TextColor="{Binding CurrentBalance, Converter={StaticResource BalanceColorConverter}}" />
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- CARD 2 -->
-                <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" BackgroundColor="#fafafa">
+                <!-- CARD 2: Pending Expenses -->
+                <Border Stroke="Gray"
+                        StrokeThickness="1"
+                        Padding="10"
+                        Margin="5"
+                        BackgroundColor="#fff3cd">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="10" />
                     </Border.StrokeShape>
-                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-                        <Label Text="Pending Expenses" FontSize="16" FontAttributes="Bold" />
+
+                    <VerticalStackLayout
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center">
+                        <Label Text="Pending Expenses"
+                               FontSize="16"
+                               FontAttributes="Bold" />
                         <Label x:Name="PendingExpensesLabel"
-                               Text="0"
                                FontSize="20"
                                FontAttributes="Bold"
-                               TextColor="Orange" />
+                               TextColor="#d9534f" />
+                        <!-- Red-Orange -->
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- CARD 3 -->
-                <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" BackgroundColor="#fafafa">
+                <!-- CARD 3: Pending Income -->
+                <Border Stroke="Gray"
+                        StrokeThickness="1"
+                        Padding="10"
+                        Margin="5"
+                        BackgroundColor="#d1ecf1">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="10" />
                     </Border.StrokeShape>
-                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-                        <Label Text="Pending Income" FontSize="16" FontAttributes="Bold" />
+
+                    <VerticalStackLayout
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center">
+                        <Label Text="Pending Income"
+                               FontSize="16"
+                               FontAttributes="Bold" />
                         <Label x:Name="PendingIncomeLabel"
-                               Text="0"
                                FontSize="20"
                                FontAttributes="Bold"
-                               TextColor="Green" />
+                               TextColor="#0c5460" />
+                        <!-- Blue-Green -->
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- CARD 4 -->
-                <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" BackgroundColor="#fafafa">
+                <!-- CARD 4: Notifications -->
+                <Border Stroke="Gray"
+                        StrokeThickness="1"
+                        Padding="10"
+                        Margin="5"
+                        BackgroundColor="#fafafa">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="10" />
                     </Border.StrokeShape>
-                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-                        <Label Text="School Year Status" FontSize="16" FontAttributes="Bold" />
-                        <Label x:Name="SchoolYearStatusLabel"
-                               Text="Loading..."
+
+                    <VerticalStackLayout>
+                        <Label Text="Recent Pending Requests"
                                FontSize="16"
                                FontAttributes="Bold"
-                               TextColor="Gray" />
-                    </VerticalStackLayout>
-                </Border>
-            </Grid>
-
-            <!-- NOTIFICATIONS -->
-            <Border Stroke="Gray" StrokeThickness="1" Padding="10" BackgroundColor="#fafafa" Margin="0,10,0,20">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12" />
-                </Border.StrokeShape>
-
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Notifications"
-               FontSize="20"
-               FontAttributes="Bold"
-               TextColor="#333"
-               HorizontalOptions="Start" />
-
-                    <!-- Scrollable list with limited height -->
-                    <ScrollView HeightRequest="{OnPlatform Android=250, iOS=250, WinUI=300}"
-                    VerticalOptions="Start"
-                    BackgroundColor="Transparent">
+                               Margin="0,0,0,5" />
                         <CollectionView x:Name="NotificationListView"
-                            SelectionMode="None"
-                            EmptyView="No pending requests."
-                            VerticalOptions="Start"
-                            Margin="0,5,0,0">
+                                        ItemsSource="{Binding Notifications}"
+                                        HeightRequest="150">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <!-- Individual notification card -->
-                                    <Frame HasShadow="True"
-                               CornerRadius="8"
-                               Padding="10"
-                               Margin="4"
-                               BackgroundColor="White"
-                               BorderColor="#ddd">
-                                        <VerticalStackLayout>
-                                            <Label Text="{Binding Detail}"
-                                       FontSize="14"
-                                       FontAttributes="Bold"
-                                       TextColor="#333" />
-                                            <Label Text="{Binding DateString}"
-                                       FontSize="12"
-                                       TextColor="Gray" />
-                                        </VerticalStackLayout>
-                                    </Frame>
+                                    <VerticalStackLayout Padding="5">
+                                        <Label Text="{Binding Detail}" FontSize="14" />
+                                        <Label Text="{Binding DateString}" FontSize="12" TextColor="Gray" />
+                                        <BoxView HeightRequest="1" Color="#ddd" Margin="0,5"/>
+                                    </VerticalStackLayout>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
-                    </ScrollView>
-                </VerticalStackLayout>
-            </Border>
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
 
+            <!--  Buttons Section -->
+            <VerticalStackLayout Spacing="10">
+                <Button Text="View Organization Profile"
+                        Clicked="OnViewOrgProfileClicked"
+                        BackgroundColor="#28a745"
+                        TextColor="White" />
 
+                <Button Text="Manage Officers"
+                        Clicked="OnManageOfficersClicked"
+                        BackgroundColor="#28a745"
+                        TextColor="White" />
+
+                <Button Text="School Year Management"
+                        Clicked="OnSchoolYearClicked"
+                        BackgroundColor="#28a745"
+                        TextColor="White" />
+
+                <Button Text="Expense Requests"
+                        Clicked="OnExpenseRequestsClicked"
+                        BackgroundColor="#28a745"
+                        TextColor="White" />
+
+                <Button Text="Income Requests"
+                        Clicked="OnIncomeRequestsClicked"
+                        BackgroundColor="#28a745"
+                        TextColor="White" />
+
+                <Button Text="Events"
+                        Clicked="OnEventsClicked"
+                        BackgroundColor="#28a745"
+                        TextColor="white" />
+
+                <Button Text="Logout"
+                        Clicked="OnLogoutClicked"
+                        BackgroundColor="#8B0000"
+                        TextColor="White" />
+            </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

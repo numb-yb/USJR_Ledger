@@ -7,134 +7,101 @@
     BackgroundColor="#f5f5f7">
 
     <ScrollView>
-        <Grid Padding="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+        <VerticalStackLayout Padding="20" Spacing="20">
 
             <!-- Header -->
-            <Label
-                Text="Welcome, System Administrator"
-                FontSize="24"
-                FontAttributes="Bold"
-                HorizontalOptions="Center"
-                Margin="0,12,0,20" />
+            <Label Text="Welcome, System Administrator"
+                   x:Name="WelcomeLabel"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="Black" />
 
-            <!-- Main Layout -->
-            <StackLayout
-                x:Name="MainLayout"
-                Grid.Row="1"
-                Spacing="25"
-                HorizontalOptions="Center"
-                WidthRequest="{OnIdiom Phone=Auto, Tablet=600}">
+            <!-- System Overview -->
+            <Label Text="System Overview"
+                   FontSize="16"
+                   TextColor="Gray"
+                   HorizontalOptions="Center" />
 
-                <!-- Action Buttons -->
-                <VerticalStackLayout Spacing="12">
-                    <Button
-                        Text="Create Organization"
-                        BackgroundColor="#5C4DFF"
-                        TextColor="White"
-                        CornerRadius="8"
-                        HeightRequest="48"
-                        FontSize="16"
-                        HorizontalOptions="FillAndExpand" />
+            <Label Text="Active: System Running Smoothly"
+                   FontSize="16"
+                   FontAttributes="Italic"
+                   TextColor="#28a745"
+                   HorizontalOptions="Center" />
 
-                    <Button
-                        Text="View Organizations"
-                        BackgroundColor="#5C4DFF"
-                        TextColor="White"
-                        CornerRadius="8"
-                        HeightRequest="48"
-                        FontSize="16"
-                        HorizontalOptions="FillAndExpand" />
-
-                    <Button
-                        Text="Manage Advisers"
-                        BackgroundColor="#5C4DFF"
-                        TextColor="White"
-                        CornerRadius="8"
-                        HeightRequest="48"
-                        FontSize="16"
-                        HorizontalOptions="FillAndExpand" />
+            <!-- Quick Stats Card -->
+            <Frame BorderColor="Gray"
+                   CornerRadius="10"
+                   HasShadow="True"
+                   Padding="10"
+                   BackgroundColor="#fafafa">
+                <VerticalStackLayout>
+                    <Label Text="Quick Stats"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                    <Label x:Name="TotalOrganizationsLabel"
+                           Text="Total Organizations: 0"
+                           FontSize="14" />
+                    <Label x:Name="ActiveOrganizationsLabel"
+                           Text="Active Organizations: 0"
+                           FontSize="14" />
+                    <Label x:Name="TotalAdvisersLabel"
+                           Text="Total Advisers: 0"
+                           FontSize="14" />
+                    <Label x:Name="TotalTransactionsLabel"
+                           Text="Total Transactions: 0"
+                           FontSize="14" />
+                    <Label x:Name="TotalEventsLabel"
+                           Text="Total Events: 0"
+                           FontSize="14" />
                 </VerticalStackLayout>
+            </Frame>
 
-                <!-- System Actions + Quick Stats -->
-                <Grid RowDefinitions="Auto,Auto"
-                      Padding="0,10,0,0"
-                      RowSpacing="25">
+            <!-- Buttons -->
+            <VerticalStackLayout Spacing="10">
+                <Button Text="Create Organization"
+                        Clicked="OnCreateOrgClicked"
+                        BackgroundColor="#28a745"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="48"
+                        FontSize="16" />
 
-                    <!-- Reset and Logout Buttons -->
-                    <HorizontalStackLayout
-                        x:Name="SystemActions"
-                        Spacing="16"
-                        HorizontalOptions="Center"
-                        Margin="10,0,10,0"
-                        Grid.Row="0">
-                        <Button
-                            Text="RESET ENTIRE SYSTEM"
-                            BackgroundColor="#FF0000"
-                            TextColor="White"
-                            CornerRadius="10"
-                            HeightRequest="50"
-                            FontSize="16"
-                            HorizontalOptions="FillAndExpand"
-                            WidthRequest="{OnIdiom Phone=150, Tablet=220}" />
+                <Button Text="View Organizations"
+                        Clicked="OnViewOrgsClicked"
+                        BackgroundColor="#28a745"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="48"
+                        FontSize="16" />
 
-                        <Button
-                            Text="Logout"
-                            BackgroundColor="#8B0000"
-                            TextColor="White"
-                            CornerRadius="10"
-                            HeightRequest="50"
-                            FontSize="16"
-                            HorizontalOptions="FillAndExpand"
-                            WidthRequest="{OnIdiom Phone=150, Tablet=220}" />
-                    </HorizontalStackLayout>
+                <Button Text="Manage Advisers"
+                        Clicked="OnManageAdvisersClicked"
+                        BackgroundColor="#28a745"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="48"
+                        FontSize="16" />
 
-                    <!-- Quick Stats Box -->
-                    <Frame
-                        Grid.Row="1"
-                        Padding="20"
-                        Margin="10,0,10,25"
-                        BorderColor="#D0D0D0"
-                        CornerRadius="14"
-                        HasShadow="True"
-                        BackgroundColor="White"
-                        HorizontalOptions="FillAndExpand">
+                <Button Text="Reset Entire System"
+                        Clicked="OnCompleteSystemResetClicked"
+                        BackgroundColor="#28a745"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="48"
+                        FontSize="16" />
 
-                        <VerticalStackLayout Spacing="6">
-                            <Label
-                                Text="Quick Stats"
-                                FontSize="18"
-                                FontAttributes="Bold"
-                                TextColor="#333"
-                                Margin="0,0,0,8" />
-                            <Label
-                                Text="Total Organizations: 0"
-                                FontSize="14"
-                                TextColor="Gray" />
-                            <Label
-                                Text="Active Organizations: 0"
-                                FontSize="14"
-                                TextColor="Gray" />
-                            <Label
-                                Text="Total Advisers: 0"
-                                FontSize="14"
-                                TextColor="Gray" />
-                            <Label
-                                Text="Total Transactions: 0"
-                                FontSize="14"
-                                TextColor="Gray" />
-                            <Label
-                                Text="Total Events: 0"
-                                FontSize="14"
-                                TextColor="Gray" />
-                        </VerticalStackLayout>
-                    </Frame>
-                </Grid>
+                <Button Text="Logout"
+                        Clicked="OnLogoutClicked"
+                        BackgroundColor="#8B0000"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        FontSize="16"
+                        Margin="0,10,0,0" />
+            </VerticalStackLayout>
 
-            </StackLayout>
-        </Grid>
+        </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

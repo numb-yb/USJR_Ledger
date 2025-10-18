@@ -13,31 +13,47 @@
     </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
+        <VerticalStackLayout Padding="20" 
+                             Spacing="20">
 
             <!-- Add Officer Section -->
-            <Border Stroke="Gray" StrokeThickness="1" Padding="15" StrokeShape="RoundRectangle 8" Margin="0,0,0,10">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="Add New Officer" FontSize="20" FontAttributes="Bold" />
+            <Border Stroke="Gray" 
+                    StrokeThickness="1" 
+                    Padding="15" 
+                    StrokeShape="RoundRectangle 8"
+                    Margin="0,0,0,10">
+                <VerticalStackLayout 
+                    Spacing="15">
+                    <Label Text="Add New Officer" 
+                           FontSize="20"
+                           FontAttributes="Bold" />
 
-                    <VerticalStackLayout Spacing="5">
+                    <VerticalStackLayout 
+                        Spacing="5">
                         <Label Text="Full Name" />
-                        <Entry x:Name="NameEntry" Placeholder="Enter officer's full name" />
+                        <Entry x:Name="NameEntry" 
+                               Placeholder="Enter officer's full name" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Student ID (Username)" />
-                        <Entry x:Name="StudentIdEntry" Placeholder="Enter student ID" />
+                        <Entry x:Name="StudentIdEntry" 
+                               Placeholder="Enter student ID" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="5">
+                    <VerticalStackLayout 
+                        Spacing="5">
                         <Label Text="Position" />
-                        <Entry x:Name="PositionEntry" Placeholder="Enter position (e.g. President, Treasurer)" />
+                        <Entry x:Name="PositionEntry"
+                               Placeholder="Enter position (e.g. President, Treasurer)" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="5">
+                    <VerticalStackLayout 
+                        Spacing="5">
                         <Label Text="Temporary Password" />
-                        <Entry x:Name="PasswordEntry" Placeholder="Enter temporary password" IsPassword="True" />
+                        <Entry x:Name="PasswordEntry" 
+                               Placeholder="Enter temporary password"
+                               IsPassword="True" />
                     </VerticalStackLayout>
 
                     <Button Text="Add Officer"
@@ -50,15 +66,26 @@
             </Border>
 
             <!-- Current Officers Section -->
-            <Border Stroke="Gray" StrokeThickness="1" Padding="15" StrokeShape="RoundRectangle 8">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="Current Officers" FontSize="20" FontAttributes="Bold" />
+            <Border Stroke="Gray" 
+                    StrokeThickness="1"
+                    Padding="15"
+                    StrokeShape="RoundRectangle 8">
+                <VerticalStackLayout 
+                    Spacing="15">
+                    <Label Text="Current Officers" 
+                           FontSize="20"
+                           FontAttributes="Bold" />
 
-                    <ListView x:Name="OfficersListView" HasUnevenRows="True" SeparatorVisibility="None">
+                    <ListView x:Name="OfficersListView"
+                              HasUnevenRows="True"
+                              SeparatorVisibility="None">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <ViewCell>
-                                    <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5" StrokeShape="RoundRectangle 8">
+                                    <Border Stroke="Gray" 
+                                            StrokeThickness="1" 
+                                            Padding="10" Margin="5" 
+                                            StrokeShape="RoundRectangle 8">
                                         <Grid RowDefinitions="Auto,Auto,Auto,Auto">
 
                                             <Label Grid.Row="0"
@@ -71,12 +98,18 @@
                                                    FontSize="14"
                                                    TextColor="Gray" />
 
-                                            <StackLayout Grid.Row="2" Orientation="Horizontal" Spacing="5">
-                                                <Label Text="Status:" FontAttributes="Bold" />
+                                            <StackLayout Grid.Row="2"
+                                                         Orientation="Horizontal" 
+                                                         Spacing="5">
+                                                <Label Text="Status:" 
+                                                       FontAttributes="Bold" />
                                                 <Label Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" />
                                             </StackLayout>
 
-                                            <StackLayout Grid.Row="3" Orientation="Horizontal" Spacing="10" HorizontalOptions="End">
+                                            <StackLayout Grid.Row="3" 
+                                                         Orientation="Horizontal"
+                                                         Spacing="10" 
+                                                         HorizontalOptions="End">
                                                 <Button Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
                                                         BackgroundColor="#2196F3"
                                                         TextColor="White"

@@ -38,10 +38,10 @@ namespace USJRLedger.Views.Adviser
             base.OnAppearing();
             _isVisible = true;
 
-            //Subscribe to officer change messages
+            // Subscribe to officer change messages
             MessagingCenter.Subscribe<ManageOfficersPage>(this, "OfficersChanged", async (sender) =>
             {
-                await Task.Delay(150); // allow UI teardown to finish
+                await Task.Delay(150);
                 if (_isVisible)
                     await LoadDashboardAsync();
             });
@@ -59,7 +59,6 @@ namespace USJRLedger.Views.Adviser
             base.OnDisappearing();
             _isVisible = false;
 
-            //Unsubscribe when not visible
             MessagingCenter.Unsubscribe<ManageOfficersPage>(this, "OfficersChanged");
         }
 
@@ -79,6 +78,7 @@ namespace USJRLedger.Views.Adviser
                         OrganizationLabel.Text = "No Organization Assigned";
                         SchoolYearStatusLabel.Text = "N/A";
                         BalanceLabel.Text = "₱ 0.00";
+                        BalanceLabel.TextColor = Colors.Black;
                         PendingExpensesLabel.Text = "0";
                         PendingIncomeLabel.Text = "0";
                         NotificationListView.ItemsSource = null;
@@ -122,7 +122,6 @@ namespace USJRLedger.Views.Adviser
 
                 if (!_isVisible) return;
 
-                // Safely update UI on main thread
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     if (!_isVisible) return;
@@ -133,7 +132,10 @@ namespace USJRLedger.Views.Adviser
                         : "No Active School Year";
                     SchoolYearStatusLabel.TextColor = _currentSchoolYear != null ? Colors.Green : Colors.Red;
 
+                    // ✅ Update balance and color
                     BalanceLabel.Text = $"₱ {balance:N2}";
+                    BalanceLabel.TextColor = balance < 0 ? Colors.Red : Colors.Black;
+
                     PendingExpensesLabel.Text = pendingExpenses.ToString();
                     PendingIncomeLabel.Text = pendingIncome.ToString();
                     NotificationListView.ItemsSource = notifications;
@@ -205,6 +207,7 @@ namespace USJRLedger.Views.Adviser
             _authService.Logout();
             Application.Current.MainPage = new NavigationPage(new LoginPage(_authService));
         }
+
         protected override void OnSizeAllocated(double width, double height)
         {
             base.OnSizeAllocated(width, height);
@@ -212,11 +215,9 @@ namespace USJRLedger.Views.Adviser
             if (SummaryGrid == null || SummaryGrid.Children.Count < 4)
                 return;
 
-            // Clear layout structure before rebuilding
             SummaryGrid.RowDefinitions.Clear();
             SummaryGrid.ColumnDefinitions.Clear();
 
-            // Adjust card sizing to prevent overflow in portrait
             double cardWidth = width > height ? width / 4.5 : width / 2.2;
 
             if (width > height)
@@ -231,7 +232,7 @@ namespace USJRLedger.Views.Adviser
                     if (SummaryGrid.Children[i] is Border border)
                     {
                         border.WidthRequest = cardWidth;
-                        border.HeightRequest = -1; // Auto height
+                        border.HeightRequest = -1;
                     }
 
                     SummaryGrid.SetRow(SummaryGrid.Children[i], 0);
@@ -268,7 +269,6 @@ namespace USJRLedger.Views.Adviser
                 SummaryGrid.SetColumn(SummaryGrid.Children[3], 1);
             }
 
-            // Safe MAUI-compatible way to force re-layout
             SummaryGrid.Dispatcher.Dispatch(() =>
             {
                 SummaryGrid.WidthRequest = SummaryGrid.WidthRequest + 0.01;
@@ -276,9 +276,6 @@ namespace USJRLedger.Views.Adviser
             });
         }
 
-
-
-
         #endregion
     }
-}   
+}
