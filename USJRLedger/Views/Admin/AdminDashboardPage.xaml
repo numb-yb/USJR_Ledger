@@ -23,12 +23,6 @@
                    TextColor="Gray"
                    HorizontalOptions="Center" />
 
-            <Label Text="Active: System Running Smoothly"
-                   FontSize="16"
-                   FontAttributes="Italic"
-                   TextColor="#28a745"
-                   HorizontalOptions="Center" />
-
             <!-- Quick Stats Card -->
             <Frame BorderColor="Gray"
                    CornerRadius="10"
@@ -86,7 +80,7 @@
 
                 <Button Text="Reset Entire System"
                         Clicked="OnCompleteSystemResetClicked"
-                        BackgroundColor="#28a745"
+                        BackgroundColor="#dc3545"
                         TextColor="White"
                         CornerRadius="10"
                         HeightRequest="48"

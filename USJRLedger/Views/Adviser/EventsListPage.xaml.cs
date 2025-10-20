@@ -62,24 +62,24 @@ namespace USJRLedger.Views.Adviser
                         });
                     }
 
-                    EventsListView.ItemsSource = eventViewModels.OrderByDescending(e => e.EventDate);
+                    EventsCollectionView.ItemsSource = eventViewModels.OrderByDescending(e => e.EventDate);
 
                     if (eventViewModels.Count == 0)
                     {
                         NoEventsLabel.IsVisible = true;
-                        EventsListView.IsVisible = false;
+                        EventsCollectionView.IsVisible = false;
                     }
                     else
                     {
                         NoEventsLabel.IsVisible = false;
-                        EventsListView.IsVisible = true;
+                        EventsCollectionView.IsVisible = true;
                     }
                 }
                 else
                 {
                     SchoolYearLabel.Text = "No Active School Year";
                     NoEventsLabel.IsVisible = true;
-                    EventsListView.IsVisible = false;
+                    EventsCollectionView.IsVisible = false;
                 }
             }
             catch (Exception ex)
@@ -93,7 +93,7 @@ namespace USJRLedger.Views.Adviser
             var button = sender as Button;
             var eventViewModel = button?.BindingContext as EventViewModel;
 
-            if (eventViewModel != null)
+            if (eventViewModel != null) 
             {
                 await Navigation.PushAsync(new EventDetailsPage(_authService, _dataService, eventViewModel.Id));
             }

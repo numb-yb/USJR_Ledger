@@ -3,26 +3,44 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="USJRLedger.Views.Officer.CreateEventPage"
              Title="Create Event">
-    <VerticalStackLayout Padding="20" Spacing="20">
-        <Label x:Name="SchoolYearLabel" FontSize="18" FontAttributes="Bold" />
+    <VerticalStackLayout Padding="20" 
+                         Spacing="20">
+        <Label x:Name="SchoolYearLabel" 
+               FontSize="18" 
+               FontAttributes="Bold" />
 
-        <Frame BorderColor="Gray" Padding="15">
-            <VerticalStackLayout Spacing="15">
-                <Label Text="Event Information" FontSize="20" FontAttributes="Bold" />
+        <Frame BorderColor="Gray"
+               Padding="15">
+            <VerticalStackLayout 
+                Spacing="15">
+                <Label Text="Event Information" 
+                       FontSize="20"
+                       FontAttributes="Bold" />
 
-                <VerticalStackLayout Spacing="5">
+                <VerticalStackLayout 
+                    Spacing="5">
                     <Label Text="Event Name" />
-                    <Entry x:Name="EventNameEntry" Placeholder="Enter event name" />
+                    <Entry x:Name="EventNameEntry" 
+                           Placeholder="Enter event name" />
                 </VerticalStackLayout>
 
-                <VerticalStackLayout Spacing="5">
-                    <Label Text="Event Date" />
-                    <DatePicker x:Name="EventDatePicker" />
+                <VerticalStackLayout
+                    Spacing="5">
+                    <Label 
+                        Text="Event Date" />
+                    <DatePicker
+                        x:Name="EventDatePicker" />
                 </VerticalStackLayout>
 
-                <HorizontalStackLayout Spacing="10" HorizontalOptions="End">
-                    <Button Text="Cancel" Clicked="OnCancelClicked" BackgroundColor="Gray" />
-                    <Button Text="Create Event" Clicked="OnCreateEventClicked" />
+                <HorizontalStackLayout Spacing="10"
+                                       HorizontalOptions="End">
+                    <Button Text="Cancel" 
+                            Clicked="OnCancelClicked" 
+                            BackgroundColor="Gray" />
+                    <Button Text="Create Event"
+                            BackgroundColor="#28a745"
+                            TextColor="White"
+                            Clicked="OnCreateEventClicked" />
                 </HorizontalStackLayout>
             </VerticalStackLayout>
         </Frame>

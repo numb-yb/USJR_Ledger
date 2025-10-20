@@ -18,14 +18,14 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <!--  Border instead of Frame -->
+                   
                     <Border Stroke="Gray"
                             StrokeShape="RoundRectangle 12"
                             BackgroundColor="White"
                             Padding="10"
                             Margin="5">
 
-                        <!-- Optional subtle shadow (works safely in MAUI 7/8) -->
+                       
                         <Border.Shadow>
                             <Shadow Brush="#00000022"
                                     Offset="5,5"
@@ -38,19 +38,22 @@
                               RowSpacing="6">
 
                             <!-- Organization Name -->
-                            <Label Grid.Row="0" Grid.Column="0"
+                            <Label Grid.Row="0" 
+                                   Grid.Column="0"
                                    Text="{Binding Name}"
                                    FontAttributes="Bold"
                                    FontSize="18"/>
 
                             <!-- Department -->
-                            <Label Grid.Row="1" Grid.Column="0"
+                            <Label Grid.Row="1"
+                                   Grid.Column="0"
                                    Text="{Binding Department}"
                                    FontSize="14"
                                    TextColor="Gray"/>
 
                             <!-- Status -->
-                            <HorizontalStackLayout Grid.Row="2" Grid.Column="0"
+                            <HorizontalStackLayout Grid.Row="2" 
+                                                   Grid.Column="0"
                                                    Spacing="5">
                                 <Label Text="Status:" FontAttributes="Bold"/>
                                 <Label Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}"
@@ -58,28 +61,35 @@
                             </HorizontalStackLayout>
 
                             <!-- Buttons -->
-                            <VerticalStackLayout Grid.Row="0" Grid.Column="1"
-                                                 Grid.RowSpan="3"
-                                                 VerticalOptions="Center"
-                                                 Spacing="8">
-                                <Button Text="View Details"
-                                        BindingContext="{Binding .}"
-                                        Clicked="OnViewDetailsClicked"
-                                        BackgroundColor="#5C4DFF"
-                                        TextColor="White"
-                                        CornerRadius="8"
-                                        HeightRequest="36"
-                                        FontSize="14"/>
+                            <VerticalStackLayout
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Grid.RowSpan="3"
+                                VerticalOptions="Center"
+                                Spacing="8">
+                                <!-- View Details button (Green) -->
+                                <Button 
+                                    Text="View Details"
+                                    BindingContext="{Binding .}"
+                                    Clicked="OnViewDetailsClicked"
+                                    BackgroundColor="#28a745"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    HeightRequest="36"
+                                    FontSize="14"/>
 
-                                <Button Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
-                                        BackgroundColor="{Binding IsActive, Converter={StaticResource BoolToColorConverter}}"
-                                        BindingContext="{Binding .}"
-                                        Clicked="OnUpdateStatusClicked"
-                                        TextColor="White"
-                                        CornerRadius="8"
-                                        HeightRequest="36"
-                                        FontSize="14"/>
+                                <!-- Deactivate button (Red) -->
+                                <Button 
+                                    Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
+                                    BindingContext="{Binding .}"
+                                    Clicked="OnUpdateStatusClicked"
+                                    BackgroundColor="#dc3545"
+                                    TextColor="White"
+                                    CornerRadius="8"
+                                    HeightRequest="36"
+                                    FontSize="14"/>
                             </VerticalStackLayout>
+
 
                         </Grid>
                     </Border>

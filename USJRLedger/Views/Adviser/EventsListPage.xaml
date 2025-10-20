@@ -3,12 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="USJRLedger.Views.Adviser.EventsListPage"
              Title="Events">
+
     <VerticalStackLayout Padding="20" Spacing="20">
-        <Label x:Name="SchoolYearLabel" FontSize="18" FontAttributes="Bold" />
+        <!-- School Year Label -->
+        <Label x:Name="SchoolYearLabel"
+               FontSize="18"
+               FontAttributes="Bold" />
 
-        <Label Text="All Events" FontSize="20" FontAttributes="Bold" />
+        <Label Text="All Events"
+               FontSize="20"
+               FontAttributes="Bold" />
 
-        <Label x:Name="NoEventsLabel" 
+        <!-- Message when no events -->
+        <Label x:Name="NoEventsLabel"
                Text="No events found for the current school year"
                HorizontalOptions="Center"
                VerticalOptions="Center"
@@ -16,38 +23,63 @@
                TextColor="Gray"
                IsVisible="False" />
 
-        <ListView x:Name="EventsListView" HasUnevenRows="True">
-            <ListView.ItemTemplate>
+        <!-- replacement for ListView -->
+        <CollectionView x:Name="EventsCollectionView"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <ViewCell>
-                        <Frame Margin="5" Padding="10" BorderColor="Gray">
-                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
-                                <Label Grid.Row="0" Grid.Column="0" 
-                                       Text="{Binding Name}" 
-                                       FontAttributes="Bold" 
-                                       FontSize="16" />
+                    <Border Stroke="Gray"
+                            StrokeShape="RoundRectangle 10"
+                            Padding="12"
+                            Margin="5">
 
-                                <StackLayout Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="5">
-                                    <Label Text="Event Date:" FontAttributes="Bold" />
-                                    <Label Text="{Binding EventDate}" />
-                                </StackLayout>
+                        <Grid RowDefinitions="Auto,Auto,Auto"
+                              ColumnDefinitions="*,Auto">
 
-                                <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Spacing="5">
-                                    <Label Text="Balance:" FontAttributes="Bold" />
-                                    <Label Text="{Binding Balance}" TextColor="{Binding BalanceAmount, Converter={StaticResource AmountColorConverter}}" />
-                                </StackLayout>
+                            <!-- Event Name -->
+                            <Label Grid.Row="0"
+                                   Grid.Column="0"
+                                   Text="{Binding Name}"
+                                   FontAttributes="Bold"
+                                   FontSize="16" />
 
-                                <Button Grid.Row="0" Grid.Column="1" 
-                                        Grid.RowSpan="3" 
-                                        VerticalOptions="Center"
-                                        Text="View Details"
+                            <!-- Event Date -->
+                            <HorizontalStackLayout Grid.Row="1"
+                                                   Grid.Column="0"
+                                                   Spacing="5">
+                                <Label Text="Event Date:"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding EventDate}" />
+                            </HorizontalStackLayout>
+
+                            <!-- Balance -->
+                            <HorizontalStackLayout Grid.Row="2"
+                                                   Grid.Column="0"
+                                                   Spacing="5">
+                                <Label Text="Balance:"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding Balance}"
+                                       TextColor="{Binding BalanceAmount, Converter={StaticResource AmountColorConverter}}" />
+                            </HorizontalStackLayout>
+
+                            <!-- Action Button -->
+                            <VerticalStackLayout Grid.Row="0"
+                                                 Grid.Column="1"
+                                                 Grid.RowSpan="3"
+                                                 VerticalOptions="Center"
+                                                 Spacing="10">
+                                <Button Text="View Details"
+                                        BackgroundColor="#28a745"
+                                        TextColor="White"
+                                        CornerRadius="6"
                                         BindingContext="{Binding .}"
                                         Clicked="OnViewEventDetailsClicked" />
-                            </Grid>
-                        </Frame>
-                    </ViewCell>
+                            </VerticalStackLayout>
+
+                        </Grid>
+                    </Border>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </VerticalStackLayout>
 </ContentPage>

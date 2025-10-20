@@ -59,7 +59,7 @@
                     <Button Text="Add Officer"
                             Clicked="OnAddOfficerClicked"
                             HorizontalOptions="End"
-                            BackgroundColor="#6200EE"
+                            BackgroundColor="#28a745"
                             TextColor="White"
                             CornerRadius="6" />
                 </VerticalStackLayout>
@@ -111,7 +111,7 @@
                                                          Spacing="10" 
                                                          HorizontalOptions="End">
                                                 <Button Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
-                                                        BackgroundColor="#2196F3"
+                                                        BackgroundColor="#8B0000"
                                                         TextColor="White"
                                                         CornerRadius="6"
                                                         HeightRequest="35"

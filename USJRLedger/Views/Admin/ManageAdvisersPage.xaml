@@ -13,29 +13,38 @@
     </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
+        <VerticalStackLayout Padding="20" 
+                             Spacing="20">
 
             <!-- Add Adviser Section -->
-            <Frame BorderColor="Gray" Padding="15" CornerRadius="10">
+            <Frame BorderColor="Gray"
+                   Padding="15"
+                   CornerRadius="10">
                 <VerticalStackLayout Spacing="15">
-                    <Label Text="Add New Adviser" FontSize="20" FontAttributes="Bold" />
+                    <Label Text="Add New Adviser" 
+                           FontSize="20" 
+                           FontAttributes="Bold" />
 
                     <!-- Full Name -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Full Name" />
-                        <Entry x:Name="NameEntry" Placeholder="Enter adviser's full name" />
+                        <Entry x:Name="NameEntry" 
+                               Placeholder="Enter adviser's full name" />
                     </VerticalStackLayout>
 
                     <!-- Username -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Employee ID (Username)" />
-                        <Entry x:Name="UsernameEntry" Placeholder="Enter employee ID" />
+                        <Entry x:Name="UsernameEntry"
+                               Placeholder="Enter employee ID" />
                     </VerticalStackLayout>
 
                     <!-- Password -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Temporary Password" />
-                        <Entry x:Name="PasswordEntry" Placeholder="Enter temporary password" IsPassword="True" />
+                        <Entry x:Name="PasswordEntry" 
+                               Placeholder="Enter temporary password"
+                               IsPassword="True" />
                     </VerticalStackLayout>
 
                     <!-- Organization Picker -->
@@ -61,9 +70,10 @@
                     <Button Text="Add Adviser"
                             Clicked="OnAddAdviserClicked"
                             HorizontalOptions="End"
-                            BackgroundColor="#6200EE"
+                            BackgroundColor="#28a745"
                             TextColor="White"
                             CornerRadius="6" />
+
                 </VerticalStackLayout>
             </Frame>
 
@@ -106,7 +116,7 @@
                                                      Spacing="10"
                                                      HorizontalOptions="End">
                                             <Button Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
-                                                    BackgroundColor="#2196F3"
+                                                    BackgroundColor="#8B0000"
                                                     TextColor="White"
                                                     CornerRadius="6"
                                                     HeightRequest="35"

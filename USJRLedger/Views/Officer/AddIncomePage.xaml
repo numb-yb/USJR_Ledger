@@ -4,26 +4,42 @@
              x:Class="USJRLedger.Views.Officer.AddIncomePage"
              Title="Add Income">
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
-            <Label x:Name="SchoolYearLabel" FontSize="18" FontAttributes="Bold" />
+        <VerticalStackLayout Padding="20" 
+                             Spacing="20">
+            <Label x:Name="SchoolYearLabel" 
+                   FontSize="18" 
+                   FontAttributes="Bold" />
 
-            <Frame BorderColor="Gray" Padding="15">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="Income Details" FontSize="20" FontAttributes="Bold" />
+            <Frame BorderColor="Gray" 
+                   Padding="15">
+                <VerticalStackLayout 
+                    Spacing="15">
+                    <Label Text="Income Details"
+                           FontSize="20"
+                           FontAttributes="Bold" />
 
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Income Description" />
-                        <Entry x:Name="DetailEntry" Placeholder="Enter income description" />
+                        <Entry x:Name="DetailEntry" 
+                               Placeholder="Enter income description" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Amount" />
-                        <Entry x:Name="AmountEntry" Placeholder="Enter amount" Keyboard="Numeric" />
+                    <VerticalStackLayout 
+                        Spacing="5">
+                        <Label 
+                            Text="Amount" />
+                        <Entry 
+                            x:Name="AmountEntry" 
+                               Placeholder="Enter amount" 
+                            Keyboard="Numeric" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Category" />
-                        <Picker x:Name="CategoryPicker" SelectedIndexChanged="OnCategoryChanged">
+                    <VerticalStackLayout 
+                        Spacing="5">
+                        <Label
+                            Text="Category" />
+                        <Picker x:Name="CategoryPicker"
+                                SelectedIndexChanged="OnCategoryChanged">
                             <Picker.Items>
                                 <x:String>General Income</x:String>
                                 <x:String>Event Income</x:String>
@@ -31,22 +47,41 @@
                         </Picker>
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout x:Name="EventPickerStack" Spacing="5" IsVisible="False">
-                        <Label Text="Select Event" />
-                        <Picker x:Name="EventPicker" />
+                    <VerticalStackLayout x:Name="EventPickerStack"
+                                         Spacing="5"
+                                         IsVisible="False">
+                        <Label 
+                            Text="Select Event" />
+                        <Picker 
+                            x:Name="EventPicker" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="Receipt" />
-                        <HorizontalStackLayout Spacing="10">
-                            <Button x:Name="SelectReceiptButton" Text="Select Receipt" Clicked="OnSelectReceiptClicked" />
-                            <Label x:Name="ReceiptFileLabel" VerticalOptions="Center" />
+                    <VerticalStackLayout 
+                        Spacing="5">
+                        <Label 
+                            Text="Receipt" />
+                        <HorizontalStackLayout 
+                            Spacing="10">
+                            <Button 
+                                x:Name="SelectReceiptButton"
+                                Text="Select Receipt"
+                                BackgroundColor="#28a745"
+                                TextColor="White"
+                                Clicked="OnSelectReceiptClicked" />
+                            <Label x:Name="ReceiptFileLabel" 
+                                   VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </VerticalStackLayout>
 
-                    <HorizontalStackLayout Spacing="10" HorizontalOptions="End">
-                        <Button Text="Cancel" Clicked="OnCancelClicked" BackgroundColor="Gray" />
-                        <Button Text="Add Income" Clicked="OnAddIncomeClicked" />
+                    <HorizontalStackLayout Spacing="10" 
+                                           HorizontalOptions="End">
+                        <Button Text="Cancel" 
+                                Clicked="OnCancelClicked"
+                                BackgroundColor="Gray" />
+                        <Button Text="Add Income"
+                                BackgroundColor="#28a745"
+                                TextColor="White"
+                                Clicked="OnAddIncomeClicked" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Frame>
