@@ -89,29 +89,44 @@
                     <!-- Password Entry -->
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Password"
-                               FontSize="14"
-                               TextColor="#666666"
-                               Margin="8,0,0,0"/>
+           FontSize="14"
+           TextColor="#666666"
+           Margin="8,0,0,0"/>
+
                         <Border StrokeShape="RoundRectangle 10"
-                                Stroke="#e0e0e0"
-                                StrokeThickness="1"
-                                BackgroundColor="#f9f9f9">
-                            <Grid ColumnDefinitions="Auto,*" Padding="15,0">
+            Stroke="#e0e0e0"
+            StrokeThickness="1"
+            BackgroundColor="#f9f9f9">
+
+                            <Grid ColumnDefinitions="Auto,*,Auto" Padding="15,0">
+                                <!-- Lock Icon -->
                                 <Image Grid.Column="0"
-                                       Source="lock_icon.png"
-                                       HeightRequest="20"
-                                       WidthRequest="20"
-                                       VerticalOptions="Center"
-                                       Margin="0,0,10,0"/>
+                   Source="lock_icon.png"
+                   HeightRequest="20"
+                   WidthRequest="20"
+                   VerticalOptions="Center"
+                   Margin="0,0,10,0"/>
+
+                                <!-- Password Entry -->
                                 <Entry Grid.Column="1"
-                                       x:Name="PasswordEntry"
-                                       Placeholder="Enter your password"
-                                       PlaceholderColor="#bdbdbd"
-                                       TextColor="#333333"
-                                       IsPassword="True"
-                                       BackgroundColor="Transparent"
-                                       VerticalOptions="Center"
-                                       HeightRequest="50"/>
+                   x:Name="PasswordEntry"
+                   Placeholder="Enter your password"
+                   PlaceholderColor="#bdbdbd"
+                   TextColor="#333333"
+                   IsPassword="True"
+                   BackgroundColor="Transparent"
+                   VerticalOptions="Center"
+                   HeightRequest="50"/>
+
+                                <!-- Show/Hide Password Button -->
+                                <ImageButton Grid.Column="2"
+                         x:Name="TogglePasswordButton"
+                         Source="eye_closed.png"
+                         HeightRequest="20"
+                         WidthRequest="20"
+                         BackgroundColor="Transparent"
+                         VerticalOptions="Center"
+                         Clicked="OnTogglePasswordClicked"/>
                             </Grid>
                         </Border>
                     </VerticalStackLayout>

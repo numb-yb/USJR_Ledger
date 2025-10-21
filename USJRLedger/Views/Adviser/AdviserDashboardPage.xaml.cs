@@ -25,7 +25,7 @@ namespace USJRLedger.Views.Adviser
         private SchoolYear _currentSchoolYear;
         private bool _isVisible;
 
-        public AdviserDashboardPage(AuthService authService)
+        public AdviserDashboardPage(AuthService authService, DataService dataService)
         {
             InitializeComponent();
             _authService = authService;
@@ -132,7 +132,7 @@ namespace USJRLedger.Views.Adviser
                         : "No Active School Year";
                     SchoolYearStatusLabel.TextColor = _currentSchoolYear != null ? Colors.Green : Colors.Red;
 
-                    // ✅ Update balance and color
+                    //  Update balance and color
                     BalanceLabel.Text = $"₱ {balance:N2}";
                     BalanceLabel.TextColor = balance < 0 ? Colors.Red : Colors.Black;
 

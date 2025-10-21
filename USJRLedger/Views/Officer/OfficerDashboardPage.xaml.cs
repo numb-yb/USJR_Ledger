@@ -20,7 +20,7 @@ namespace USJRLedger.Views.Officer
         private Organization _organization;
         private SchoolYear _currentSchoolYear;
 
-        public OfficerDashboardPage(AuthService authService)
+        public OfficerDashboardPage(AuthService authService, DataService dataService)
         {
             InitializeComponent();
             _authService = authService;

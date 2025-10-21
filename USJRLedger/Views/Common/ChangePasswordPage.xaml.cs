@@ -9,11 +9,13 @@ namespace USJRLedger.Views.Common
     public partial class ChangePasswordPage : ContentPage
     {
         private readonly AuthService _authService;
+        private readonly DataService _dataService; 
 
         public ChangePasswordPage(AuthService authService)
         {
             InitializeComponent();
             _authService = authService;
+            _dataService = new DataService(); // Initialize DataService
         }
 
         private async void OnChangePasswordClicked(object sender, EventArgs e)
@@ -45,8 +47,8 @@ namespace USJRLedger.Views.Common
             Page dashboardPage = _authService.CurrentUser.Role switch
             {
                 UserRole.Admin => new AdminDashboardPage(_authService),
-                UserRole.Adviser => new AdviserDashboardPage(_authService),
-                UserRole.Officer => new OfficerDashboardPage(_authService),
+                UserRole.Adviser => new AdviserDashboardPage(_authService, _dataService), 
+                UserRole.Officer => new OfficerDashboardPage(_authService, _dataService), 
                 _ => throw new NotImplementedException("Unknown user role")
             };
 

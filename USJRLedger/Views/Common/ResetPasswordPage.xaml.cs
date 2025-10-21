@@ -48,10 +48,11 @@ namespace USJRLedger.Views.Common
             }
         }
 
-        
+
         private async void OnBackToLoginTapped(object sender, EventArgs e)
         {
             await Navigation.PopAsync(); // Go back to LoginPage
         }
+
     }
 }
