@@ -50,10 +50,11 @@
                                FontAttributes="Bold"
                                TextColor="Black" />
                         <Label x:Name="BalanceLabel"
-                               Text="₱ -490,000.00"
+                               Text="₱ 0.00"
                                FontSize="20"
                                FontAttributes="Bold"
-                               TextColor="Red" />
+                               TextColor="Black" />
+
                     </VerticalStackLayout>
                 </Frame>
 

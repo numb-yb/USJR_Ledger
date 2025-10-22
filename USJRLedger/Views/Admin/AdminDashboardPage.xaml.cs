@@ -94,7 +94,7 @@ namespace USJRLedger.Views.Admin
             {
                 await DisplayAlert("Processing", "Resetting the system. Please wait...", "OK");
 
-                // Use the correct method and pass the admin ID
+            
                 string adminId = _authService.CurrentUser?.Id ?? string.Empty;
                 var results = await _resetService.PerformCompleteSystemResetAsync(adminId);
 

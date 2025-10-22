@@ -24,7 +24,7 @@ namespace USJRLedger.Views.Officer
         {
             InitializeComponent();
             _authService = authService;
-            _dataService = new DataService();
+            _dataService = dataService;
 
             WelcomeLabel.Text = $"Welcome, {_authService.CurrentUser.Name}";
             PositionLabel.Text = $"Position: {_authService.CurrentUser.Position}";
@@ -62,15 +62,25 @@ namespace USJRLedger.Views.Officer
                 var transactions = await _dataService.LoadFromFileAsync<Transaction>("transactions.json");
                 var orgTransactions = transactions.Where(t => t.OrganizationId == _organization.Id);
 
-                decimal totalIncome = orgTransactions.Where(t => t.Type == TransactionType.Income && t.ApprovalStatus == ApprovalStatus.Approved).Sum(t => t.Amount);
-                decimal totalExpense = orgTransactions.Where(t => t.Type == TransactionType.Expense && t.ApprovalStatus == ApprovalStatus.Approved).Sum(t => t.Amount);
+                decimal totalIncome = orgTransactions
+                    .Where(t => t.Type == TransactionType.Income && t.ApprovalStatus == ApprovalStatus.Approved)
+                    .Sum(t => t.Amount);
+
+                decimal totalExpense = orgTransactions
+                    .Where(t => t.Type == TransactionType.Expense && t.ApprovalStatus == ApprovalStatus.Approved)
+                    .Sum(t => t.Amount);
+
                 decimal balance = totalIncome - totalExpense;
 
+                // ✅ Display and color the balance
                 BalanceLabel.Text = $"₱ {balance:N2}";
+                BalanceLabel.TextColor = balance < 0 ? Colors.Red : Colors.Black;
 
-                int pendingExpensesCount = orgTransactions.Count(t => t.Type == TransactionType.Expense &&
-                                                                t.ApprovalStatus == ApprovalStatus.Pending &&
-                                                                t.CreatedBy == _authService.CurrentUser.Id);
+                int pendingExpensesCount = orgTransactions.Count(t =>
+                    t.Type == TransactionType.Expense &&
+                    t.ApprovalStatus == ApprovalStatus.Pending &&
+                    t.CreatedBy == _authService.CurrentUser.Id);
+
                 PendingExpensesLabel.Text = pendingExpensesCount.ToString();
 
                 var recentTransactions = orgTransactions
@@ -99,6 +109,7 @@ namespace USJRLedger.Views.Officer
                 OrganizationLabel.Text = "No Organization Assigned";
                 SchoolYearLabel.Text = "N/A";
                 BalanceLabel.Text = "₱ 0.00";
+                BalanceLabel.TextColor = Colors.Black;
                 PendingExpensesLabel.Text = "0";
             }
         }
