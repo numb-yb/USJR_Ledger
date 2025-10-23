@@ -11,6 +11,7 @@ namespace USJRLedger.Views.Common
     {
         private readonly AuthService _authService;
         private readonly DataService _dataService;
+        private bool _isPasswordVisible = false;
 
         public LoginPage(AuthService authService)
         {
@@ -27,40 +28,59 @@ namespace USJRLedger.Views.Common
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 StatusLabel.Text = "Please enter both username and password.";
+                StatusLabel.TextColor = Colors.Red;
                 return;
             }
 
-            bool isLoggedIn = await _authService.LoginAsync(username, password);
-
-            if (isLoggedIn)
+            try
             {
-                if (_authService.RequiresPasswordChange())
-                {
-                    await Navigation.PushAsync(new ChangePasswordPage(_authService));
-                    return;
-                }
+                bool isLoggedIn = await _authService.LoginAsync(username, password);
 
-
-                Page dashboardPage = _authService.CurrentUser.Role switch
+                if (isLoggedIn)
                 {
-                    UserRole.Admin => new AdminDashboardPage(_authService),
-                    UserRole.Adviser => new AdviserDashboardPage(_authService, _dataService),
-                    UserRole.Officer => new OfficerDashboardPage(_authService, _dataService),
-                    _ => null
-                };
+                    // Force password change if flagged as temporary
+                    if (_authService.RequiresPasswordChange())
+                    {
+                        await Navigation.PushAsync(new ChangePasswordPage(_authService));
+                        return;
+                    }
 
-                if (dashboardPage != null)
-                {
-                    Application.Current.MainPage = new NavigationPage(dashboardPage);
+                    // Navigate based on role
+                    Page dashboardPage = _authService.CurrentUser.Role switch
+                    {
+                        UserRole.Admin => new AdminDashboardPage(_authService),
+                        UserRole.Adviser => new AdviserDashboardPage(_authService, _dataService),
+                        UserRole.Officer => new OfficerDashboardPage(_authService, _dataService),
+                        _ => null
+                    };
+
+                    if (dashboardPage != null)
+                    {
+                        Application.Current.MainPage = new NavigationPage(dashboardPage);
+                    }
+                    else
+                    {
+                        StatusLabel.Text = "User role not recognized.";
+                        StatusLabel.TextColor = Colors.Red;
+                    }
                 }
                 else
                 {
-                    StatusLabel.Text = "User role not recognized.";
+                    StatusLabel.Text = "Invalid username or password.";
+                    StatusLabel.TextColor = Colors.Red;
                 }
             }
-            else
+            catch (UnauthorizedAccessException ex)
             {
-                StatusLabel.Text = "Invalid username or password.";
+                //Account is deactivated or unauthorized
+                await DisplayAlert("Account Deactivated", ex.Message, "OK");
+                StatusLabel.Text = ex.Message;
+                StatusLabel.TextColor = Colors.Red;
+            }
+            catch (Exception)
+            {
+                StatusLabel.Text = "An error occurred while logging in. Please try again.";
+                StatusLabel.TextColor = Colors.Red;
             }
         }
 
@@ -69,15 +89,11 @@ namespace USJRLedger.Views.Common
             await Navigation.PushAsync(new ResetPasswordPage(_authService));
         }
 
-        private bool _isPasswordVisible = false;
-
         private void OnTogglePasswordClicked(object sender, EventArgs e)
         {
             _isPasswordVisible = !_isPasswordVisible;
-
             PasswordEntry.IsPassword = !_isPasswordVisible;
             TogglePasswordButton.Source = _isPasswordVisible ? "eye_open.png" : "eye_closed.png";
         }
-
     }
 }

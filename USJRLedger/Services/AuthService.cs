@@ -20,25 +20,35 @@ namespace USJRLedger.Services
             _dataService = dataService;
         }
 
-        //  Login and store session
+        //LOGIN with specific deactivation warnings
         public async Task<bool> LoginAsync(string username, string password)
         {
             var users = await _dataService.LoadFromFileAsync<User>("users.json");
-            var user = users.FirstOrDefault(u => u.Username == username && u.Password == password && u.IsActive);
+            var user = users.FirstOrDefault(u => u.Username == username && u.Password == password);
 
-            if (user != null)
+            if (user == null)
+                throw new UnauthorizedAccessException("Invalid username or password.");
+
+            if (!user.IsActive)
             {
-                CurrentUser = user;
+                // Custom message depending on role
+                string deactivatedBy = user.Role switch
+                {
+                    UserRole.Officer => "your Adviser",
+                    UserRole.Adviser => "the Administrator",
+                    UserRole.Admin => "the System Administrator",
+                    _ => "an Administrator"
+                };
 
-                // Save session for persistence
-                await SaveSessionAsync();
-                return true;
+                throw new UnauthorizedAccessException($"Your account has been deactivated by {deactivatedBy}. Please contact them for reactivation.");
             }
 
-            return false;
+            CurrentUser = user;
+            await SaveSessionAsync();
+            return true;
         }
 
-        //  Proper Logout – clears memory + stored session
+        // Proper Logout – clears memory + stored session
         public void Logout()
         {
             CurrentUser = null;
@@ -49,7 +59,7 @@ namespace USJRLedger.Services
             }
         }
 
-        //  Save session to a small file
+        //Save session to local file
         private async Task SaveSessionAsync()
         {
             try
@@ -59,11 +69,11 @@ namespace USJRLedger.Services
             }
             catch
             {
-                // Fail silently – session save isn’t critical
+                // Silent fail – session save isn’t critical
             }
         }
 
-        //  Restore session if user was logged in previously
+        //Restore previous login session if still active
         public async Task<bool> RestoreSessionAsync()
         {
             try
@@ -77,19 +87,18 @@ namespace USJRLedger.Services
                 if (user == null)
                     return false;
 
-                // Check if still active
+                // Check if the user still exists and is active
                 var users = await _dataService.LoadFromFileAsync<User>("users.json");
-                var refreshedUser = users.FirstOrDefault(u => u.Id == user.Id && u.IsActive);
+                var refreshedUser = users.FirstOrDefault(u => u.Id == user.Id);
 
-                if (refreshedUser != null)
+                if (refreshedUser == null || !refreshedUser.IsActive)
                 {
-                    CurrentUser = refreshedUser;
-                    return true;
+                    Logout();
+                    return false;
                 }
 
-                // Invalid user or deactivated
-                Logout();
-                return false;
+                CurrentUser = refreshedUser;
+                return true;
             }
             catch
             {
@@ -97,7 +106,7 @@ namespace USJRLedger.Services
             }
         }
 
-        // Change password for the currently logged-in user
+        //  Change password for the current user
         public async Task ChangePasswordAsync(string newPassword)
         {
             if (CurrentUser == null)
@@ -113,19 +122,21 @@ namespace USJRLedger.Services
                 await _dataService.SaveToFileAsync(users, "users.json");
 
                 CurrentUser = userToUpdate;
-                await SaveSessionAsync(); // Update stored session with new password
+                await SaveSessionAsync(); // Update stored session
             }
         }
-        // Check if the user is required to change their password
+
+        //  Check if user must change temporary password
         public bool RequiresPasswordChange()
         {
             return CurrentUser != null && CurrentUser.IsTemporaryPassword;
         }
+
+        //  Reset password (for Admin or Adviser to use)
         public async Task<bool> ResetPasswordAsync(string username, string newPassword)
         {
             var users = await _dataService.LoadFromFileAsync<User>("users.json");
 
-            // Allow only Adviser and Officer accounts to be reset
             var user = users.FirstOrDefault(u =>
                 u.Username.Equals(username, StringComparison.OrdinalIgnoreCase) &&
                 (u.Role == UserRole.Adviser || u.Role == UserRole.Officer));
@@ -134,12 +145,10 @@ namespace USJRLedger.Services
                 return false;
 
             user.Password = newPassword;
-            user.IsTemporaryPassword = false; // mark as updated
+            user.IsTemporaryPassword = false;
 
             await _dataService.SaveToFileAsync(users, "users.json");
             return true;
         }
-
-
     }
 }

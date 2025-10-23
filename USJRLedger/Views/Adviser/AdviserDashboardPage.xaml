@@ -38,25 +38,44 @@
             <Grid x:Name="SummaryGrid"
                   ColumnSpacing="10"
                   RowSpacing="10"
-                  HorizontalOptions="Center"
+                  HorizontalOptions="FillAndExpand"
                   VerticalOptions="Center">
 
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition 
+                        Width="*" />
+                    <ColumnDefinition 
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition 
+                        Height="Auto" />
+                    <RowDefinition 
+                        Height="Auto" />
+                </Grid.RowDefinitions>
+
                 <!-- CARD 1: Current Balance -->
-                <Border Stroke="Gray"
+                <Border Grid.Row="0" 
+                        Grid.Column="0"
+                        Stroke="Gray"
                         StrokeThickness="1"
                         Padding="10"
                         Margin="5"
-                        BackgroundColor="#fafafa">
+                        BackgroundColor="#fafafa"
+                        HorizontalOptions="FillAndExpand">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="10" />
+                        <RoundRectangle 
+                            CornerRadius="10" />
                     </Border.StrokeShape>
 
-                    <VerticalStackLayout
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center">
+                    <VerticalStackLayout 
+                        Spacing="4"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Start">
                         <Label Text="Current Balance"
                                FontSize="16"
-                               FontAttributes="Bold" />
+                               FontAttributes="Bold"
+                               TextColor="Black" />
                         <Label x:Name="BalanceLabel"
                                FontSize="20"
                                FontAttributes="Bold"
@@ -66,77 +85,103 @@
                 </Border>
 
                 <!-- CARD 2: Pending Expenses -->
-                <Border Stroke="Gray"
+                <Border Grid.Row="0" 
+                        Grid.Column="1"
+                        Stroke="Gray"
                         StrokeThickness="1"
                         Padding="10"
                         Margin="5"
-                        BackgroundColor="#fff3cd">
+                        BackgroundColor="#fff3cd"
+                        HorizontalOptions="FillAndExpand">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="10" />
+                        <RoundRectangle 
+                            CornerRadius="10" />
                     </Border.StrokeShape>
 
-                    <VerticalStackLayout
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center">
+                    <VerticalStackLayout 
+                        Spacing="4"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Start">
                         <Label Text="Pending Expenses"
                                FontSize="16"
-                               FontAttributes="Bold" />
+                               FontAttributes="Bold"
+                               TextColor="Black" />
                         <Label x:Name="PendingExpensesLabel"
                                FontSize="20"
                                FontAttributes="Bold"
                                TextColor="#d9534f" />
-                        <!-- Red-Orange -->
                     </VerticalStackLayout>
                 </Border>
 
                 <!-- CARD 3: Pending Income -->
-                <Border Stroke="Gray"
+                <Border Grid.Row="1" 
+                        Grid.Column="0"
+                        Stroke="Gray"
                         StrokeThickness="1"
                         Padding="10"
                         Margin="5"
-                        BackgroundColor="#d1ecf1">
+                        BackgroundColor="#d1ecf1"
+                        HorizontalOptions="FillAndExpand">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="10" />
+                        <RoundRectangle 
+                            CornerRadius="10" />
                     </Border.StrokeShape>
 
                     <VerticalStackLayout
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center">
+                        Spacing="4"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Start">
                         <Label Text="Pending Income"
                                FontSize="16"
-                               FontAttributes="Bold" />
+                               FontAttributes="Bold"
+                               TextColor="Black" />
                         <Label x:Name="PendingIncomeLabel"
                                FontSize="20"
                                FontAttributes="Bold"
                                TextColor="#0c5460" />
-                        <!-- Blue-Green -->
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- CARD 4: Notifications -->
-                <Border Stroke="Gray"
+                <!-- CARD 4: Recent Pending Requests -->
+                <Border Grid.Row="1"
+                        Grid.Column="1"
+                        Stroke="Gray"
                         StrokeThickness="1"
                         Padding="10"
                         Margin="5"
-                        BackgroundColor="#fafafa">
+                        BackgroundColor="#fafafa"
+                        HorizontalOptions="FillAndExpand">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="10" />
+                        <RoundRectangle 
+                            CornerRadius="10" />
                     </Border.StrokeShape>
 
-                    <VerticalStackLayout>
+                    <VerticalStackLayout
+                        Spacing="4"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Start">
                         <Label Text="Recent Pending Requests"
                                FontSize="16"
                                FontAttributes="Bold"
+                               TextColor="Black"
                                Margin="0,0,0,5" />
                         <CollectionView x:Name="NotificationListView"
                                         ItemsSource="{Binding Notifications}"
-                                        HeightRequest="150">
+                                        HeightRequest="100">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <VerticalStackLayout Padding="5">
-                                        <Label Text="{Binding Detail}" FontSize="14" />
-                                        <Label Text="{Binding DateString}" FontSize="12" TextColor="Gray" />
-                                        <BoxView HeightRequest="1" Color="#ddd" Margin="0,5"/>
+                                    <VerticalStackLayout 
+                                        Padding="5">
+                                        <Label
+                                            Text="{Binding Detail}"
+                                            FontSize="14" />
+                                        <Label 
+                                            Text="{Binding DateString}" 
+                                            FontSize="12" 
+                                            TextColor="Gray" />
+                                        <BoxView HeightRequest="1"
+                                                 Color="#ddd"
+                                                 Margin="0,5"/>
                                     </VerticalStackLayout>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
@@ -144,6 +189,7 @@
                     </VerticalStackLayout>
                 </Border>
             </Grid>
+
 
             <!--  Buttons Section -->
             <VerticalStackLayout Spacing="10">
