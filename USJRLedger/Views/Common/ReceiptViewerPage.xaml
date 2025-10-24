@@ -1,12 +1,33 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="USJRLedger.Views.Common.ReceiptViewerPage">
+             x:Class="USJRLedger.Views.Common.ReceiptViewerPage"
+             BackgroundColor="White"
+             Title="Receipt Viewer">
+
     <ScrollView>
-        <VerticalStackLayout Padding="20" HorizontalOptions="Center">
-            <Image x:Name="ReceiptImage" 
+        <VerticalStackLayout Padding="20"
+                             HorizontalOptions="Center"
+                             VerticalOptions="CenterAndExpand"
+                             Spacing="15">
+            <Label x:Name="TitleLabel"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   TextColor="Black"
+                   HorizontalOptions="Center" />
+
+            <Image x:Name="ReceiptImage"
+                   WidthRequest="300"
+                   HeightRequest="400"
+                   Aspect="AspectFit"
                    HorizontalOptions="Center"
                    VerticalOptions="Center" />
+
+            <Label x:Name="MessageLabel"
+                   TextColor="Gray"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   IsVisible="False" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using USJRLedger.Models;
+using System.IO;
 
 namespace USJRLedger.Services
 {
@@ -55,6 +56,34 @@ namespace USJRLedger.Services
                               .ToList();
         }
 
+        //Save receipt to a consistent folder (Receipts/{OrganizationId})
+        private async Task<string> SaveReceiptAsync(byte[] receiptData, string receiptFileName, string organizationId)
+        {
+            if (receiptData == null || string.IsNullOrWhiteSpace(receiptFileName))
+                return null;
+
+            try
+            {
+                string baseDir = FileSystem.AppDataDirectory;
+                string receiptDir = Path.Combine(baseDir, "Receipts", organizationId);
+
+                if (!Directory.Exists(receiptDir))
+                    Directory.CreateDirectory(receiptDir);
+
+                // Prevent duplicate file names
+                string uniqueFileName = $"{Guid.NewGuid()}_{receiptFileName}";
+                string fullPath = Path.Combine(receiptDir, uniqueFileName);
+
+                await File.WriteAllBytesAsync(fullPath, receiptData);
+                return fullPath;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving receipt: {ex.Message}");
+                return null;
+            }
+        }
+
         public async Task<Transaction> AddExpenseAsync(string organizationId, string schoolYearId,
                                                       string eventId, TransactionCategory category,
                                                       string detail, decimal amount,
@@ -63,11 +92,7 @@ namespace USJRLedger.Services
         {
             var transactions = await _dataService.LoadFromFileAsync<Transaction>("transactions.json");
 
-            string receiptPath = null;
-            if (receiptData != null && receiptFileName != null)
-            {
-                receiptPath = await _dataService.SaveReceiptAsync(receiptData, receiptFileName);
-            }
+            string receiptPath = await SaveReceiptAsync(receiptData, receiptFileName, organizationId);
 
             var newExpense = new Transaction
             {
@@ -97,11 +122,7 @@ namespace USJRLedger.Services
         {
             var transactions = await _dataService.LoadFromFileAsync<Transaction>("transactions.json");
 
-            string receiptPath = null;
-            if (receiptData != null && receiptFileName != null)
-            {
-                receiptPath = await _dataService.SaveReceiptAsync(receiptData, receiptFileName);
-            }
+            string receiptPath = await SaveReceiptAsync(receiptData, receiptFileName, organizationId);
 
             var newIncome = new Transaction
             {
@@ -138,18 +159,15 @@ namespace USJRLedger.Services
             }
         }
 
-        // Add this new method for resetting all pending transactions
+        //  Reset all pending transactions (both income & expense)
         public async Task<int> ResetAllPendingTransactionsAsync(string adminId)
         {
-            // Load all transactions
             var transactions = await _dataService.LoadFromFileAsync<Transaction>("transactions.json");
 
-            // Find all pending transactions (both income and expense)
             var pendingTransactions = transactions
                 .Where(t => t.ApprovalStatus == ApprovalStatus.Pending)
                 .ToList();
 
-            // Update each transaction to rejected status
             foreach (var transaction in pendingTransactions)
             {
                 transaction.ApprovalStatus = ApprovalStatus.Rejected;
@@ -157,10 +175,8 @@ namespace USJRLedger.Services
                 transaction.ApprovalDate = DateTime.Now;
             }
 
-            // Save the updated transactions back to the file
             await _dataService.SaveToFileAsync(transactions, "transactions.json");
 
-            // Return the count of reset transactions
             return pendingTransactions.Count;
         }
     }

@@ -12,19 +12,19 @@
             <Frame Padding="20" BackgroundColor="Green" CornerRadius="0" HasShadow="False">
                 <VerticalStackLayout Spacing="5">
                     <Label x:Name="WelcomeLabel"
-                           Text="Welcome, Jak Menguez"
+                           Text="Welcome, Officer"
                            FontSize="20"
                            TextColor="White"
                            HorizontalOptions="Center" />
 
                     <Label x:Name="OrganizationLabel"
-                           Text="Organization: ComEs (Engineering)"
+                           Text="Organization: Unknown"
                            FontSize="14"
                            TextColor="White"
                            HorizontalOptions="Center" />
 
                     <Label x:Name="PositionLabel"
-                           Text="Position: President"
+                           Text="Position: Unknown"
                            FontSize="13"
                            TextColor="#D1C4E9"
                            HorizontalOptions="Center" />
@@ -54,7 +54,6 @@
                                FontSize="20"
                                FontAttributes="Bold"
                                TextColor="Black" />
-
                     </VerticalStackLayout>
                 </Frame>
 
@@ -66,7 +65,7 @@
                                FontAttributes="Bold"
                                TextColor="Black" />
                         <Label x:Name="PendingExpensesLabel"
-                               Text="1"
+                               Text="0"
                                FontSize="20"
                                FontAttributes="Bold"
                                TextColor="Orange" />
@@ -96,7 +95,7 @@
                                FontAttributes="Bold"
                                TextColor="Black" />
                         <Label x:Name="SchoolYearLabel"
-                               Text="Active: 1st Semester 2025-2026"
+                               Text="N/A"
                                FontSize="14"
                                TextColor="Green"
                                FontAttributes="Bold" />
@@ -115,25 +114,28 @@
                                     EmptyView="No recent transactions found.">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Grid ColumnDefinitions="*,Auto,Auto" Padding="5">
-                                    <VerticalStackLayout>
+                                <Frame Margin="0,5" Padding="10" BorderColor="#ddd" CornerRadius="10">
+                                    <VerticalStackLayout Spacing="5">
                                         <Label Text="{Binding Detail}"
                                                FontAttributes="Bold"
                                                FontSize="14" />
                                         <Label Text="{Binding DateString}"
                                                FontSize="12"
                                                TextColor="Gray" />
+                                        <Label Text="{Binding AmountString}"
+                                               FontSize="14" />
+                                        <Label Text="{Binding StatusString}"
+                                               FontSize="14" />
+
+                                        <!-- View Receipt Button -->
+                                        <Button Text="View Receipt"
+                                                Clicked="OnViewReceiptClicked"
+                                                IsVisible="{Binding HasReceipt}"
+                                                BackgroundColor="#4CAF50"
+                                                TextColor="White"
+                                                CornerRadius="10"/>
                                     </VerticalStackLayout>
-                                    <Label Grid.Column="1"
-                                           Text="{Binding AmountString}"
-                                           FontSize="14"
-                                           VerticalOptions="Center" />
-                                    <Label Grid.Column="2"
-                                           Text="{Binding StatusString}"
-                                           FontSize="14"
-                                           VerticalOptions="Center"
-                                           Margin="10,0,0,0" />
-                                </Grid>
+                                </Frame>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>

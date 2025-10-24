@@ -6,11 +6,13 @@ namespace USJRLedger.Views.Officer
 {
     public class TransactionItem
     {
+        public string Id { get; set; }
         public string Detail { get; set; }
         public string DateString { get; set; }
         public string AmountString { get; set; }
         public string StatusString { get; set; }
         public Color StatusColor { get; set; }
+        public string ReceiptPath { get; set; }
     }
 
     public partial class OfficerDashboardPage : ContentPage
@@ -71,8 +73,6 @@ namespace USJRLedger.Views.Officer
                     .Sum(t => t.Amount);
 
                 decimal balance = totalIncome - totalExpense;
-
-                // ✅ Display and color the balance
                 BalanceLabel.Text = $"₱ {balance:N2}";
                 BalanceLabel.TextColor = balance < 0 ? Colors.Red : Colors.Black;
 
@@ -89,6 +89,7 @@ namespace USJRLedger.Views.Officer
                     .Take(10)
                     .Select(t => new TransactionItem
                     {
+                        Id = t.Id,
                         Detail = $"{(t.Type == TransactionType.Income ? "Income" : "Expense")}: {t.Detail}",
                         DateString = t.CreatedDate.ToString("MMM dd, yyyy"),
                         AmountString = $"₱ {t.Amount:N2}",
@@ -98,11 +99,13 @@ namespace USJRLedger.Views.Officer
                             ApprovalStatus.Approved => Colors.Green,
                             ApprovalStatus.Rejected => Colors.Red,
                             _ => Colors.Orange
-                        }
+                        },
+                        ReceiptPath = t.ReceiptPath // the path for viewing
                     })
                     .ToList();
 
                 TransactionsListView.ItemsSource = recentTransactions;
+                TransactionsListView.SelectionChanged += OnTransactionSelected;
             }
             else
             {
@@ -111,6 +114,41 @@ namespace USJRLedger.Views.Officer
                 BalanceLabel.Text = "₱ 0.00";
                 BalanceLabel.TextColor = Colors.Black;
                 PendingExpensesLabel.Text = "0";
+            }
+        }
+
+        // View Receipt on tap
+        private async void OnTransactionSelected(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.CurrentSelection.FirstOrDefault() is TransactionItem selectedTransaction)
+            {
+                TransactionsListView.SelectedItem = null; // Deselect
+
+                if (!string.IsNullOrEmpty(selectedTransaction.ReceiptPath))
+                {
+                    try
+                    {
+                        if (File.Exists(selectedTransaction.ReceiptPath))
+                        {
+                            // Load image bytes from file
+                            var imageBytes = await File.ReadAllBytesAsync(selectedTransaction.ReceiptPath);
+                            await Navigation.PushAsync(new ReceiptViewerPage(selectedTransaction.Detail, imageBytes));
+                        }
+                        else
+                        {
+                            // Show placeholder if file missing
+                            await Navigation.PushAsync(new ReceiptViewerPage(selectedTransaction.Detail, null));
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        await DisplayAlert("Error", "Failed to load receipt.", "OK");
+                    }
+                }
+                else
+                {
+                    await Navigation.PushAsync(new ReceiptViewerPage(selectedTransaction.Detail, null));
+                }
             }
         }
 
@@ -188,5 +226,40 @@ namespace USJRLedger.Views.Officer
             _authService.Logout();
             Application.Current.MainPage = new NavigationPage(new LoginPage(_authService));
         }
+
+        private async void OnViewReceiptClicked(object sender, EventArgs e)
+        {
+            if (sender is Button button && button.BindingContext is TransactionItem transactionItem)
+            {
+                if (string.IsNullOrEmpty(transactionItem.ReceiptPath))
+                {
+                    await DisplayAlert("No Receipt", "This transaction does not have a receipt attached.", "OK");
+                    return;
+                }
+
+                try
+                {
+                    // Load the receipt file as bytes
+                    var filePath = transactionItem.ReceiptPath;
+                    if (File.Exists(filePath))
+                    {
+                        var receiptBytes = await File.ReadAllBytesAsync(filePath);
+
+                        // Navigate to ReceiptViewerPage
+                        await Navigation.PushAsync(new ReceiptViewerPage(transactionItem.Detail, receiptBytes));
+                    }
+                    else
+                    {
+                        await DisplayAlert("Missing Receipt", "The receipt file could not be found. Showing placeholder.", "OK");
+                        await Navigation.PushAsync(new ReceiptViewerPage(transactionItem.Detail, Array.Empty<byte>()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await DisplayAlert("Error", $"Failed to open receipt: {ex.Message}", "OK");
+                }
+            }
+        }
+
     }
 }
