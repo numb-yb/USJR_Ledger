@@ -1,4 +1,4 @@
-using USJRLedger.Models;
+﻿using USJRLedger.Models;
 using USJRLedger.Services;
 
 namespace USJRLedger.Views.Officer
@@ -13,6 +13,7 @@ namespace USJRLedger.Views.Officer
         private SchoolYear _currentSchoolYear;
         private string _organizationId;
         private List<Event> _events;
+        private FileResult ReceiptFileResult;
 
         public AddExpensePage(AuthService authService, DataService dataService)
         {
@@ -51,21 +52,80 @@ namespace USJRLedger.Views.Officer
 
         private void OnCategoryChanged(object sender, EventArgs e)
         {
-            bool isEventExpense = CategoryPicker.SelectedIndex == 1; // "Event" option
-            EventPickerStack.IsVisible = isEventExpense;
+            EventPickerStack.IsVisible = CategoryPicker.SelectedIndex == 1; // Event Expense
+        }
+
+        private async void OnSelectReceiptClicked(object sender, EventArgs e)
+        {
+            if (ReceiptFileResult != null)
+            {
+                // Allow user to remove the current receipt
+                var confirm = await DisplayAlert("Remove Receipt?", "Do you want to remove the selected receipt?", "Yes", "No");
+                if (confirm)
+                {
+                    ReceiptFileResult = null;
+                    ReceiptFileLabel.Text = "";
+                    ReceiptPreview.IsVisible = false;
+                    SelectReceiptButton.Text = "Select Receipt";
+                }
+                return;
+            }
+
+            try
+            {
+                var result = await FilePicker.PickAsync(new PickOptions
+                {
+                    FileTypes = FilePickerFileType.Images,
+                    PickerTitle = "Select Receipt Image"
+                });
+
+                if (result != null)
+                {
+                    ReceiptFileResult = result;
+                    ReceiptFileLabel.Text = result.FileName;
+                    SelectReceiptButton.Text = "Remove Receipt";
+
+                    using var stream = await result.OpenReadAsync();
+                    using var memoryStream = new MemoryStream();
+                    await stream.CopyToAsync(memoryStream);
+                    memoryStream.Position = 0;
+
+                    //Important: clone the stream so it's not disposed
+                    ReceiptPreview.Source = ImageSource.FromStream(() => new MemoryStream(memoryStream.ToArray()));
+                    ReceiptPreview.IsVisible = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Failed to select file: {ex.Message}", "OK");
+            }
         }
 
         private async void OnAddExpenseClicked(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(DetailEntry.Text) || !decimal.TryParse(AmountEntry.Text, out decimal amount))
             {
-                await DisplayAlert("Error", "Please enter valid expense details and amount", "OK");
+                await DisplayAlert("Error", "Please enter valid expense details and amount.", "OK");
                 return;
             }
 
+            if (ReceiptFileResult == null)
+            {
+                bool proceed = await DisplayAlert(
+                    "No Receipt Attached",
+                    "You did not attach a receipt. Do you want to continue without one?",
+                    "Yes", "No");
+
+                if (!proceed)
+                    return;
+            }
+
+
             string detail = DetailEntry.Text;
-            TransactionCategory category = CategoryPicker.SelectedIndex == 0 ?
-                TransactionCategory.General : TransactionCategory.Event;
+            TransactionCategory category = CategoryPicker.SelectedIndex == 0
+                ? TransactionCategory.General
+                : TransactionCategory.Event;
 
             string eventId = null;
             if (category == TransactionCategory.Event && EventPicker.SelectedIndex > 0)
@@ -79,15 +139,14 @@ namespace USJRLedger.Views.Officer
             if (ReceiptFileResult != null)
             {
                 using (var stream = await ReceiptFileResult.OpenReadAsync())
+                using (var memoryStream = new MemoryStream())
                 {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        await stream.CopyToAsync(memoryStream);
-                        receiptData = memoryStream.ToArray();
-                        receiptFileName = ReceiptFileResult.FileName;
-                    }
+                    await stream.CopyToAsync(memoryStream);
+                    receiptData = memoryStream.ToArray();
+                    receiptFileName = ReceiptFileResult.FileName;
                 }
             }
+
 
             try
             {
@@ -111,34 +170,9 @@ namespace USJRLedger.Views.Officer
             }
         }
 
-        private async void OnSelectReceiptClicked(object sender, EventArgs e)
-        {
-            try
-            {
-                var result = await FilePicker.PickAsync(new PickOptions
-                {
-                    FileTypes = FilePickerFileType.Images,
-                    PickerTitle = "Select Receipt Image"
-                });
-
-                if (result != null)
-                {
-                    ReceiptFileResult = result;
-                    ReceiptFileLabel.Text = result.FileName;
-                    SelectReceiptButton.Text = "Change Receipt";
-                }
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", $"Failed to select file: {ex.Message}", "OK");
-            }
-        }
-
-        private FileResult ReceiptFileResult { get; set; }
-
         private async void OnCancelClicked(object sender, EventArgs e)
         {
             await Navigation.PopAsync();
         }
     }
-} 
+}

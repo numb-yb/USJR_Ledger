@@ -72,8 +72,16 @@ namespace USJRLedger.Views.Common
             }
             catch (UnauthorizedAccessException ex)
             {
-                //Account is deactivated or unauthorized
-                await DisplayAlert("Account Deactivated", ex.Message, "OK");
+                //Detect the cause of the login failure
+                if (ex.Message.Contains("deactivated", StringComparison.OrdinalIgnoreCase))
+                {
+                    await DisplayAlert("Account Deactivated", ex.Message, "OK");
+                }
+                else
+                {
+                    await DisplayAlert("Incorrect Username or Password", "Invalid username or password.", "OK");
+                }
+
                 StatusLabel.Text = ex.Message;
                 StatusLabel.TextColor = Colors.Red;
             }
@@ -82,6 +90,7 @@ namespace USJRLedger.Views.Common
                 StatusLabel.Text = "An error occurred while logging in. Please try again.";
                 StatusLabel.TextColor = Colors.Red;
             }
+
         }
 
         private async void OnForgotPasswordTapped(object sender, EventArgs e)
