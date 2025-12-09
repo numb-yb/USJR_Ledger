@@ -42,6 +42,7 @@ namespace USJRLedger.Views.Common
                 }
 
                 await LoadFinancialDataAsync();
+                await LoadIncomeTrailAsync(); // <--- This was missing!
             }
             else
             {
@@ -50,6 +51,45 @@ namespace USJRLedger.Views.Common
                 await Navigation.PopAsync();
             }
         }
+
+        private async Task LoadIncomeTrailAsync()
+        {
+            // 1. Load Data
+            var transactions = await _dataService.LoadFromFileAsync<Transaction>("transactions.json");
+            var schoolYears = await _dataService.LoadFromFileAsync<SchoolYear>("schoolyears.json");
+
+            // 2. Find the Active School Year
+            var activeSchoolYear = schoolYears
+                .FirstOrDefault(sy => sy.OrganizationId == _organizationId && sy.IsActive);
+
+            // If no active school year, hide list and return
+            if (activeSchoolYear == null)
+            {
+                IncomeTrailList.ItemsSource = null;
+                return;
+            }
+
+            // 3. Filter Transactions (Must match Active School Year ID)
+            var incomeList = transactions
+                .Where(t => t.OrganizationId == _organizationId &&
+                            t.Type == TransactionType.Income &&
+                            t.ApprovalStatus == ApprovalStatus.Approved &&
+                            t.SchoolYearId == activeSchoolYear.Id) // Filter by Active Year
+                .OrderByDescending(t => t.CreatedDate)
+                .ToList();
+
+            // 4. Map for Display
+            var displayList = incomeList.Select(t => new
+            {
+                Source = t.Category.ToString(),
+                Amount = t.Amount,
+                Date = t.CreatedDate,
+                Description = string.IsNullOrEmpty(t.Detail) ? t.Category.ToString() : t.Detail
+            }).ToList();
+
+            IncomeTrailList.ItemsSource = displayList;
+        }
+
 
         private async Task LoadFinancialDataAsync()
         {

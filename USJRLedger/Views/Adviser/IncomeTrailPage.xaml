@@ -1,0 +1,43 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Adviser.IncomeTrailPage"
+             Title="Income Trail">
+
+    <Grid RowDefinitions="Auto, *" Padding="15">
+
+        <Frame Grid.Row="0" CornerRadius="10" Padding="0" Margin="0,0,0,10" BorderColor="Gray">
+            <Picker x:Name="SchoolYearPicker"
+                    Title="Select School Year"
+                    SelectedIndexChanged="OnSchoolYearChanged"
+                    HorizontalTextAlignment="Center"
+                    FontSize="16"
+                    TextColor="Black"/>
+        </Frame>
+
+        <CollectionView Grid.Row="1" x:Name="IncomeTrailList">
+            <CollectionView.EmptyView>
+                <Label Text="No income found for this school year." 
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center" 
+                       TextColor="Gray"/>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="0,10" ColumnDefinitions="*, Auto">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Label Text="{Binding CreatedDate, StringFormat='{0:MMM dd, yyyy}'}" 
+                                   FontSize="12" TextColor="Gray"/>
+                            <Label Text="{Binding Detail}" 
+                                   FontSize="16" TextColor="Black" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+
+                        <Label Grid.Column="1" 
+                               Text="{Binding Amount, StringFormat='₱ {0:N2}'}"
+                               TextColor="Green" FontSize="16" FontAttributes="Bold"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

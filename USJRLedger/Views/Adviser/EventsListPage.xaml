@@ -1,85 +1,110 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:USJRLedger.Converters"
              x:Class="USJRLedger.Views.Adviser.EventsListPage"
              Title="Events">
 
-    <VerticalStackLayout Padding="20" Spacing="20">
-        <!-- School Year Label -->
-        <Label x:Name="SchoolYearLabel"
-               FontSize="18"
-               FontAttributes="Bold" />
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BalanceColorConverter x:Key="AmountColorConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
-        <Label Text="All Events"
-               FontSize="20"
-               FontAttributes="Bold" />
+    <Grid RowDefinitions="Auto, *" Padding="20">
 
-        <!-- Message when no events -->
-        <Label x:Name="NoEventsLabel"
-               Text="No events found for the current school year"
-               HorizontalOptions="Center"
-               VerticalOptions="Center"
-               FontSize="16"
-               TextColor="Gray"
-               IsVisible="False" />
+        <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="0,0,0,15">
+            <Label Text="Select School Year" FontSize="14" TextColor="Gray" Margin="5,0,0,0"/>
 
-        <!-- replacement for ListView -->
-        <CollectionView x:Name="EventsCollectionView"
+            <Border Stroke="Transparent"
+                    StrokeThickness="0"
+                    BackgroundColor="White"
+                    Padding="0"
+                    HeightRequest="50">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="5" Opacity="0.1" />
+                </Border.Shadow>
+
+                <Picker x:Name="SchoolYearPicker"
+                        Title="Select School Year"
+                        SelectedIndexChanged="OnSchoolYearChanged"
+                        HorizontalTextAlignment="Center"
+                        VerticalTextAlignment="Center"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        TextColor="#333"
+                        TitleColor="Gray"
+                        BackgroundColor="Transparent"/>
+            </Border>
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1" 
+                        x:Name="EventsCollectionView"
                         SelectionMode="None">
+
+            <CollectionView.EmptyView>
+                <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                    <Label Text="No events found for this school year." 
+                           TextColor="Gray" 
+                           FontSize="16"
+                           HorizontalOptions="Center"/>
+                </StackLayout>
+            </CollectionView.EmptyView>
+
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Border Stroke="Gray"
-                            StrokeShape="RoundRectangle 10"
-                            Padding="12"
-                            Margin="5">
+                    <Border Stroke="Transparent"
+                            StrokeThickness="0"
+                            BackgroundColor="White"
+                            Padding="15"
+                            Margin="0,5">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="Black" Offset="0,1" Radius="3" Opacity="0.1" />
+                        </Border.Shadow>
 
                         <Grid RowDefinitions="Auto,Auto,Auto"
                               ColumnDefinitions="*,Auto">
 
-                            <!-- Event Name -->
-                            <Label Grid.Row="0"
-                                   Grid.Column="0"
+                            <Label Grid.Row="0" Grid.Column="0"
                                    Text="{Binding Name}"
                                    FontAttributes="Bold"
-                                   FontSize="16" />
+                                   FontSize="16"
+                                   TextColor="#333"/>
 
-                            <!-- Event Date -->
-                            <HorizontalStackLayout Grid.Row="1"
-                                                   Grid.Column="0"
-                                                   Spacing="5">
-                                <Label Text="Event Date:"
-                                       FontAttributes="Bold" />
-                                <Label Text="{Binding EventDate}" />
+                            <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="5" Margin="0,5">
+                                <Label Text="Event Date:" FontAttributes="Bold" FontSize="12" TextColor="Gray"/>
+                                <Label Text="{Binding EventDate}" FontSize="12" TextColor="Gray"/>
                             </HorizontalStackLayout>
 
-                            <!-- Balance -->
-                            <HorizontalStackLayout Grid.Row="2"
-                                                   Grid.Column="0"
-                                                   Spacing="5">
-                                <Label Text="Balance:"
-                                       FontAttributes="Bold" />
+                            <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Spacing="5">
+                                <Label Text="Balance:" FontAttributes="Bold" FontSize="14" TextColor="#333"/>
                                 <Label Text="{Binding Balance}"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
                                        TextColor="{Binding BalanceAmount, Converter={StaticResource AmountColorConverter}}" />
                             </HorizontalStackLayout>
 
-                            <!-- Action Button -->
-                            <VerticalStackLayout Grid.Row="0"
-                                                 Grid.Column="1"
-                                                 Grid.RowSpan="3"
-                                                 VerticalOptions="Center"
-                                                 Spacing="10">
-                                <Button Text="View Details"
-                                        BackgroundColor="#28a745"
-                                        TextColor="White"
-                                        CornerRadius="6"
-                                        BindingContext="{Binding .}"
-                                        Clicked="OnViewEventDetailsClicked" />
-                            </VerticalStackLayout>
-
+                            <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
+                                    Text="View"
+                                    BackgroundColor="#28a745"
+                                    TextColor="White"
+                                    FontSize="12"
+                                    CornerRadius="6"
+                                    HeightRequest="40"
+                                    Padding="20,0"
+                                    VerticalOptions="Center"
+                                    BindingContext="{Binding .}"
+                                    Clicked="OnViewEventDetailsClicked" />
                         </Grid>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-    </VerticalStackLayout>
+    </Grid>
 </ContentPage>

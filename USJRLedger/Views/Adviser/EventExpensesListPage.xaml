@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Adviser.EventExpensesListPage"
+             Title="Event Expenses">
+
+    <Grid RowDefinitions="Auto, *" Padding="20">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="0,0,0,15">
+            <Label x:Name="SchoolYearLabel" FontSize="16" FontAttributes="Bold" TextColor="Gray" HorizontalOptions="Center"/>
+            <Label x:Name="TotalLabel" FontSize="28" FontAttributes="Bold" TextColor="#d9534f" HorizontalOptions="Center"/>
+            <Label Text="(Click an event to view breakdown)" FontSize="12" TextColor="Gray" HorizontalOptions="Center" FontAttributes="Italic"/>
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1" 
+                        x:Name="EventExpensesList" 
+                        SelectionMode="Single"
+                        SelectionChanged="OnEventSelected">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Stroke="LightGray" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="15" Margin="0,5">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="#f0f0f0" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <Grid ColumnDefinitions="*, Auto">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" TextColor="#333"/>
+                                <Label Text="{Binding DateString}" FontSize="12" TextColor="Gray"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" 
+                                   Text="{Binding TotalAmount, StringFormat='₱ {0:N2}'}" 
+                                   FontAttributes="Bold"
+                                   TextColor="#d9534f" 
+                                   VerticalOptions="Center"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <Label Text="No event expenses found." HorizontalOptions="Center" TextColor="Gray"/>
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </Grid>
+</ContentPage>

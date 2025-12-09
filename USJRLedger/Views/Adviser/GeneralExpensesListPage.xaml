@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="USJRLedger.Views.Adviser.GeneralExpensesListPage"
+             Title="General Expenses">
+
+    <Grid RowDefinitions="Auto, *" Padding="20">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="0,0,0,15">
+            <Label Text="School Year" FontSize="14" TextColor="Gray"/>
+            <Border Stroke="Transparent" BackgroundColor="#f0f0f0" HeightRequest="40" Padding="15,0" StrokeShape="RoundRectangle 10">
+                <Label x:Name="SchoolYearLabel" 
+                       VerticalOptions="Center" 
+                       FontAttributes="Bold" 
+                       TextColor="#333"/>
+            </Border>
+
+            <Label Text="Total General Expenses" FontSize="14" TextColor="Gray" Margin="0,10,0,0"/>
+            <Label x:Name="TotalLabel" 
+                   FontSize="28" 
+                   FontAttributes="Bold" 
+                   TextColor="#d9534f"/>
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1" x:Name="ExpensesCollectionView">
+            <CollectionView.EmptyView>
+                <Label Text="No general expenses found for this period." 
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center" 
+                       TextColor="Gray"/>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Stroke="LightGray" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="15" Margin="0,5">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="{Binding Detail}" FontAttributes="Bold" FontSize="16" TextColor="#333"/>
+                                <Label Text="{Binding DateString}" FontSize="12" TextColor="Gray"/>
+                                <Label Text="{Binding RequestedBy}" FontSize="11" TextColor="Gray" FontAttributes="Italic"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" 
+                                   Text="{Binding AmountString}" 
+                                   FontAttributes="Bold" 
+                                   TextColor="#d9534f" 
+                                   VerticalOptions="Center"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

@@ -3,18 +3,22 @@ using System.Text.Json.Serialization;
 
 namespace USJRLedger.Models
 {
+    // FIX 1: specific converter added here so it saves as text ("Income") not a number (0)
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum TransactionType
     {
         Income,
         Expense
     }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum TransactionCategory
     {
         General,
         Event
     }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ApprovalStatus
     {
         Pending,
@@ -33,8 +37,9 @@ namespace USJRLedger.Models
         [JsonPropertyName("schoolYearId")]
         public string SchoolYearId { get; set; }
 
+        // Nullable because not all transactions belong to an event
         [JsonPropertyName("eventId")]
-        public string EventId { get; set; }
+        public string? EventId { get; set; }
 
         [JsonPropertyName("type")]
         public TransactionType Type { get; set; }
@@ -61,10 +66,10 @@ namespace USJRLedger.Models
         public string CreatedBy { get; set; }
 
         [JsonPropertyName("approvedBy")]
-        public string ApprovedBy { get; set; }
+        public string? ApprovedBy { get; set; } // Nullable until approved
 
         [JsonPropertyName("approvalDate")]
-        public DateTime? ApprovalDate { get; set; }
+        public DateTime? ApprovalDate { get; set; } // Nullable until approved
 
         public Transaction()
         {

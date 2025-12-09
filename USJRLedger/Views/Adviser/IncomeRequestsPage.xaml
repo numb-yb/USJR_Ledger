@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="USJRLedger.Views.Adviser.IncomeRequestsPage"
              Title="Income Requests">
+
     <VerticalStackLayout Padding="20" Spacing="20">
         <Label Text="Pending Income Requests" FontSize="20" FontAttributes="Bold" />
 
@@ -18,7 +19,11 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Frame Margin="5" Padding="10" BorderColor="Gray">
+                        <Border Margin="5" Padding="10" Stroke="Gray" StrokeThickness="1">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="5" />
+                            </Border.StrokeShape>
+
                             <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
                                 <Label Grid.Row="0" Grid.Column="0" 
                                        Text="{Binding Detail}" 
@@ -64,7 +69,7 @@
                                             Clicked="OnRejectClicked" />
                                 </StackLayout>
                             </Grid>
-                        </Frame>
+                        </Border>
                     </ViewCell>
                 </DataTemplate>
             </ListView.ItemTemplate>

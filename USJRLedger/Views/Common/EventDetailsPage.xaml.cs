@@ -102,7 +102,8 @@ namespace USJRLedger.Views.Adviser
                 viewModels.Add(new TransactionViewModel
                 {
                     Detail = transaction.Detail,
-                    Amount = $"₱ {transaction.Amount:N2}",
+                    // FIX: Use \u20B1 for Peso Sign
+                    Amount = $"\u20B1 {transaction.Amount:N2}",
                     CreatedBy = creator?.Name ?? "Unknown",
                     DateString = transaction.CreatedDate.ToString("MMM dd, yyyy"),
                     HasReceipt = !string.IsNullOrEmpty(transaction.ReceiptPath),

@@ -6,228 +6,211 @@
     x:Class="USJRLedger.Views.Adviser.AdviserDashboardPage"
     Title="Adviser Dashboard">
 
-    <!--  Resource dictionary: register the color converter -->
     <ContentPage.Resources>
         <ResourceDictionary>
-            <converters:BalanceColorConverter x:Key="BalanceColorConverter" />
+            <converters:BalanceColorConverter 
+                x:Key="BalanceColorConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
-            <!-- Welcome message -->
-            <Label x:Name="WelcomeLabel"
-                   FontSize="22"
-                   FontAttributes="Bold"
-                   TextColor="Black"
-                   HorizontalOptions="Center" />
+            <VerticalStackLayout Spacing="5">
+                <Label x:Name="WelcomeLabel"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       TextColor="Black"
+                       HorizontalOptions="Center" />
 
-            <!-- Organization and school year info -->
-            <Label x:Name="OrganizationLabel"
-                   FontSize="16"
-                   TextColor="Gray"
-                   HorizontalOptions="Center" />
+                <Label x:Name="OrganizationLabel"
+                       FontSize="16"
+                       TextColor="Gray"
+                       HorizontalOptions="Center" />
 
-            <Label x:Name="SchoolYearStatusLabel"
-                   FontSize="16"
-                   FontAttributes="Italic"
-                   HorizontalOptions="Center" />
+                <Label x:Name="SchoolYearStatusLabel"
+                       FontSize="16"
+                       FontAttributes="Italic"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
 
-            <!-- Summary Grid (Balances, Pending, etc.) -->
-            <Grid x:Name="SummaryGrid"
-                  ColumnSpacing="10"
-                  RowSpacing="10"
-                  HorizontalOptions="FillAndExpand"
-                  VerticalOptions="Center">
+            <VerticalStackLayout Spacing="15">
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition 
-                        Width="*" />
-                    <ColumnDefinition 
-                        Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition 
-                        Height="Auto" />
-                    <RowDefinition 
-                        Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <!-- CARD 1: Current Balance -->
-                <Border Grid.Row="0" 
-                        Grid.Column="0"
-                        Stroke="Gray"
-                        StrokeThickness="1"
-                        Padding="10"
-                        Margin="5"
-                        BackgroundColor="#fafafa"
-                        HorizontalOptions="FillAndExpand">
+                <Border Stroke="Transparent"
+                        StrokeThickness="0"
+                        BackgroundColor="White"
+                        Padding="20">
                     <Border.StrokeShape>
                         <RoundRectangle 
-                            CornerRadius="10" />
+                            CornerRadius="15" />
                     </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="Black" 
+                                Offset="0,2" 
+                                Radius="5" 
+                                Opacity="0.1" />
+                    </Border.Shadow>
 
-                    <VerticalStackLayout 
-                        Spacing="4"
-                        HorizontalOptions="Start"
-                        VerticalOptions="Start">
-                        <Label Text="Current Balance"
-                               FontSize="16"
-                               FontAttributes="Bold"
-                               TextColor="Black" />
+                    <VerticalStackLayout Spacing="5"
+                                         VerticalOptions="Center">
+                        <Label Text="Current Balance" 
+                               FontSize="14" 
+                               TextColor="Gray" />
                         <Label x:Name="BalanceLabel"
-                               FontSize="20"
+                               FontSize="32"
                                FontAttributes="Bold"
                                Text="{Binding CurrentBalance, StringFormat='₱{0:N2}'}"
                                TextColor="{Binding CurrentBalance, Converter={StaticResource BalanceColorConverter}}" />
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- CARD 2: Pending Expenses -->
-                <Border Grid.Row="0" 
-                        Grid.Column="1"
-                        Stroke="Gray"
-                        StrokeThickness="1"
-                        Padding="10"
-                        Margin="5"
-                        BackgroundColor="#fff3cd"
-                        HorizontalOptions="FillAndExpand">
+                <Border Stroke="Transparent"
+                        StrokeThickness="0"
+                        BackgroundColor="White"
+                        Padding="0"
+                        HeightRequest="200">
                     <Border.StrokeShape>
                         <RoundRectangle 
-                            CornerRadius="10" />
+                            CornerRadius="15" />
                     </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="0,2" 
+                                Radius="5" 
+                                Opacity="0.1" />
+                    </Border.Shadow>
 
-                    <VerticalStackLayout 
-                        Spacing="4"
-                        HorizontalOptions="Start"
-                        VerticalOptions="Start">
-                        <Label Text="Pending Expenses"
-                               FontSize="16"
-                               FontAttributes="Bold"
-                               TextColor="Black" />
-                        <Label x:Name="PendingExpensesLabel"
-                               FontSize="20"
-                               FontAttributes="Bold"
-                               TextColor="#d9534f" />
-                    </VerticalStackLayout>
+                    <Grid ColumnDefinitions="120, *">
+
+                        <Grid Grid.Column="0"
+                              RowDefinitions="*, *">
+
+                            <Grid Grid.Row="0"
+                                  BackgroundColor="#d1ecf1" 
+                                  Padding="10">
+                                <VerticalStackLayout VerticalOptions="Center" 
+                                                     HorizontalOptions="Center"
+                                                     Spacing="0">
+                                    <Label Text="Pending Inc." 
+                                           FontSize="12" 
+                                           TextColor="#0c5460" 
+                                           HorizontalTextAlignment="Center"/>
+                                    <Label x:Name="PendingIncomeLabel"
+                                           Text="0"
+                                           FontSize="24"
+                                           FontAttributes="Bold"
+                                           TextColor="#0c5460" 
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <Grid Grid.Row="1" 
+                                  BackgroundColor="#fff3cd" 
+                                  Padding="10">
+                                <VerticalStackLayout VerticalOptions="Center" 
+                                                     HorizontalOptions="Center" 
+                                                     Spacing="0">
+                                    <Label Text="Pending Exp." 
+                                           FontSize="12" 
+                                           TextColor="#856404" 
+                                           HorizontalTextAlignment="Center"/>
+                                    <Label x:Name="PendingExpensesLabel"
+                                           Text="0"
+                                           FontSize="24"
+                                           FontAttributes="Bold"
+                                           TextColor="#d9534f" 
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Grid>
+
+                        <Grid Grid.Column="1" 
+                              Padding="15,10"
+                              RowDefinitions="Auto, *">
+                            <Label Grid.Row="0" 
+                                   Text="Recent Pending Requests" 
+                                   FontSize="14" 
+                                   FontAttributes="Bold" 
+                                   TextColor="Black" 
+                                   Margin="0,0,0,5"/>
+
+                            <CollectionView Grid.Row="1" 
+                                            x:Name="NotificationListView" 
+                                            ItemsSource="{Binding Notifications}">
+                                <CollectionView.EmptyView>
+                                    <Label Text="No pending requests" 
+                                           TextColor="Gray" FontSize="12" 
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center"/>
+                                </CollectionView.EmptyView>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Padding="0,4">
+                                            <VerticalStackLayout Spacing="2">
+
+                                                <ScrollView Orientation="Horizontal" 
+                                                            HorizontalScrollBarVisibility="Never">
+                                                    <Label Text="{Binding Detail}" 
+                                                           FontSize="13" 
+                                                           TextColor="#333" 
+                                                           LineBreakMode="NoWrap" />
+                                                </ScrollView>
+
+                                                <Label Text="{Binding DateString}" 
+                                                       FontSize="11"
+                                                       TextColor="Gray" />
+                                                <BoxView HeightRequest="1" Color="#f0f0f0"
+                                                         Margin="0,2,0,0"/>
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </Grid>
+                    </Grid>
                 </Border>
 
-                <!-- CARD 3: Pending Income -->
-                <Border Grid.Row="1" 
-                        Grid.Column="0"
-                        Stroke="Gray"
-                        StrokeThickness="1"
-                        Padding="10"
-                        Margin="5"
-                        BackgroundColor="#d1ecf1"
-                        HorizontalOptions="FillAndExpand">
-                    <Border.StrokeShape>
-                        <RoundRectangle 
-                            CornerRadius="10" />
-                    </Border.StrokeShape>
+            </VerticalStackLayout>
 
-                    <VerticalStackLayout
-                        Spacing="4"
-                        HorizontalOptions="Start"
-                        VerticalOptions="Start">
-                        <Label Text="Pending Income"
-                               FontSize="16"
-                               FontAttributes="Bold"
-                               TextColor="Black" />
-                        <Label x:Name="PendingIncomeLabel"
-                               FontSize="20"
-                               FontAttributes="Bold"
-                               TextColor="#0c5460" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- CARD 4: Recent Pending Requests -->
-                <Border Grid.Row="1"
-                        Grid.Column="1"
-                        Stroke="Gray"
-                        StrokeThickness="1"
-                        Padding="10"
-                        Margin="5"
-                        BackgroundColor="#fafafa"
-                        HorizontalOptions="FillAndExpand">
-                    <Border.StrokeShape>
-                        <RoundRectangle 
-                            CornerRadius="10" />
-                    </Border.StrokeShape>
-
-                    <VerticalStackLayout
-                        Spacing="4"
-                        HorizontalOptions="Start"
-                        VerticalOptions="Start">
-                        <Label Text="Recent Pending Requests"
-                               FontSize="16"
-                               FontAttributes="Bold"
-                               TextColor="Black"
-                               Margin="0,0,0,5" />
-                        <CollectionView x:Name="NotificationListView"
-                                        ItemsSource="{Binding Notifications}"
-                                        HeightRequest="100">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <VerticalStackLayout 
-                                        Padding="5">
-                                        <Label
-                                            Text="{Binding Detail}"
-                                            FontSize="14" />
-                                        <Label 
-                                            Text="{Binding DateString}" 
-                                            FontSize="12" 
-                                            TextColor="Gray" />
-                                        <BoxView HeightRequest="1"
-                                                 Color="#ddd"
-                                                 Margin="0,5"/>
-                                    </VerticalStackLayout>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </VerticalStackLayout>
-                </Border>
-            </Grid>
-
-
-            <!--  Buttons Section -->
             <VerticalStackLayout Spacing="10">
-                <Button Text="View Organization Profile"
-                        Clicked="OnViewOrgProfileClicked"
-                        BackgroundColor="#28a745"
+                <Button Text="View Organization Profile" 
+                        Clicked="OnViewOrgProfileClicked" 
+                        BackgroundColor="#28a745" 
                         TextColor="White" />
-
-                <Button Text="Manage Officers"
-                        Clicked="OnManageOfficersClicked"
-                        BackgroundColor="#28a745"
+                <Button Text="Manage Officers" 
+                        Clicked="OnManageOfficersClicked" 
+                        BackgroundColor="#28a745" 
                         TextColor="White" />
-
-                <Button Text="School Year Management"
-                        Clicked="OnSchoolYearClicked"
-                        BackgroundColor="#28a745"
+                <Button Text="School Year Management" 
+                        Clicked="OnSchoolYearClicked" 
+                        BackgroundColor="#28a745" 
                         TextColor="White" />
-
-                <Button Text="Expense Requests"
-                        Clicked="OnExpenseRequestsClicked"
-                        BackgroundColor="#28a745"
+                <Button Text="Expense Requests" 
+                        Clicked="OnExpenseRequestsClicked" 
+                        BackgroundColor="#28a745" 
                         TextColor="White" />
-
-                <Button Text="Income Requests"
-                        Clicked="OnIncomeRequestsClicked"
-                        BackgroundColor="#28a745"
+                <Button Text="Income Requests" 
+                        Clicked="OnIncomeRequestsClicked" 
+                        BackgroundColor="#28a745" 
                         TextColor="White" />
-
-                <Button Text="Events"
-                        Clicked="OnEventsClicked"
-                        BackgroundColor="#28a745"
+                <Button Text="Expense Breakdown" 
+                        Clicked="OnExpenseBreakdownClicked" 
+                        BackgroundColor="#28a745" 
+                        TextColor="White" />
+                <Button Text="Income Trail"
+                        Clicked="OnIncomeTrailClicked" 
+                        BackgroundColor="#28a745" 
+                        TextColor="White" />
+                <Button Text="Events" 
+                        Clicked="OnEventsClicked" 
+                        BackgroundColor="#28a745" 
                         TextColor="white" />
-
-                <Button Text="Logout"
-                        Clicked="OnLogoutClicked"
-                        BackgroundColor="#8B0000"
+                <Button Text="Logout" 
+                        Clicked="OnLogoutClicked" 
+                        BackgroundColor="#8B0000" 
                         TextColor="White" />
             </VerticalStackLayout>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
