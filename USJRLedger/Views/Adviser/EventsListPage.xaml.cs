@@ -1,5 +1,8 @@
 ﻿using USJRLedger.Models;
 using USJRLedger.Services;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace USJRLedger.Views.Adviser
 {
@@ -10,8 +13,9 @@ namespace USJRLedger.Views.Adviser
         private readonly EventService _eventService;
         private readonly SchoolYearService _schoolYearService;
         private readonly string _organizationId;
-        private SchoolYear _activeSchoolYear;
-        private List<Event> _events;
+
+        // Cache full list of school year objects
+        private List<SchoolYear> _allSchoolYears = new List<SchoolYear>();
 
         public EventsListPage(AuthService authService, DataService dataService)
         {
@@ -22,32 +26,71 @@ namespace USJRLedger.Views.Adviser
             _schoolYearService = new SchoolYearService(dataService);
             _organizationId = _authService.CurrentUser.OrganizationId;
 
-            LoadEventsAsync();
+            _ = InitializeDataAsync();
         }
 
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-            LoadEventsAsync();
-        }
-
-        private async void LoadEventsAsync()
+        private async Task InitializeDataAsync()
         {
             try
             {
-                _activeSchoolYear = await _schoolYearService.GetActiveSchoolYearAsync(_organizationId);
+                // 1. Load All School Years for this Org
+                var loadedYears = await _dataService.LoadFromFileAsync<SchoolYear>("schoolyears.json");
 
-                if (_activeSchoolYear != null)
+                _allSchoolYears = loadedYears
+                    .Where(sy => sy.OrganizationId == _organizationId)
+                    .OrderByDescending(sy => sy.StartDate)
+                    .ToList();
+
+                // 2. Populate Picker with DISTINCT Years only (e.g. "2026-2027")
+                // We group by the 'Year' string property to avoid duplicate entries for semesters
+                var distinctYears = _allSchoolYears
+                    .Select(sy => sy.Year)
+                    .Distinct()
+                    .ToList();
+
+                SchoolYearPicker.ItemsSource = distinctYears;
+
+                // 3. Auto-select active year
+                // Find the year string that corresponds to the currently active semester
+                var activeSy = _allSchoolYears.FirstOrDefault(sy => sy.IsActive);
+                if (activeSy != null)
                 {
-                    SchoolYearLabel.Text = $"School Year: {_activeSchoolYear.Semester} {_activeSchoolYear.Year}";
+                    SchoolYearPicker.SelectedItem = activeSy.Year;
+                }
+                else if (distinctYears.Any())
+                {
+                    SchoolYearPicker.SelectedIndex = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Failed to load data: {ex.Message}", "OK");
+            }
+        }
 
-                    // Load events for the active school year
-                    _events = await _eventService.GetEventsBySchoolYearAsync(_activeSchoolYear.Id);
+        private async void OnSchoolYearChanged(object sender, EventArgs e)
+        {
+            var selectedYearString = SchoolYearPicker.SelectedItem as string;
 
-                    // Create event view models with event balance
-                    var eventViewModels = new List<EventViewModel>();
+            if (string.IsNullOrEmpty(selectedYearString)) return;
 
-                    foreach (var eventItem in _events)
+            try
+            {
+                // 1. Find ALL SchoolYear IDs that match this string
+                // (e.g., fetch IDs for both "1st Sem 2026-2027" and "2nd Sem 2026-2027")
+                var matchingSchoolYearIds = _allSchoolYears
+                    .Where(sy => sy.Year == selectedYearString)
+                    .Select(sy => sy.Id)
+                    .ToList();
+
+                var eventViewModels = new List<EventViewModel>();
+
+                // 2. Load events for ALL matching semesters
+                foreach (var syId in matchingSchoolYearIds)
+                {
+                    var events = await _eventService.GetEventsBySchoolYearAsync(syId);
+
+                    foreach (var eventItem in events)
                     {
                         decimal balance = await _eventService.GetEventBalanceAsync(eventItem.Id);
 
@@ -57,30 +100,16 @@ namespace USJRLedger.Views.Adviser
                             Name = eventItem.Name,
                             EventDate = eventItem.EventDate.ToString("MMM dd, yyyy"),
                             CreatedDate = eventItem.CreatedDate.ToString("MMM dd, yyyy"),
-                            Balance = $"₱ {balance:N2}",
+                            Balance = $"₱{balance:N2}",
                             BalanceAmount = balance
                         });
                     }
-
-                    EventsCollectionView.ItemsSource = eventViewModels.OrderByDescending(e => e.EventDate);
-
-                    if (eventViewModels.Count == 0)
-                    {
-                        NoEventsLabel.IsVisible = true;
-                        EventsCollectionView.IsVisible = false;
-                    }
-                    else
-                    {
-                        NoEventsLabel.IsVisible = false;
-                        EventsCollectionView.IsVisible = true;
-                    }
                 }
-                else
-                {
-                    SchoolYearLabel.Text = "No Active School Year";
-                    NoEventsLabel.IsVisible = true;
-                    EventsCollectionView.IsVisible = false;
-                }
+
+                // 3. Display combined list sorted by date
+                EventsCollectionView.ItemsSource = eventViewModels
+                    .OrderByDescending(ev => ev.EventDate) // Assuming EventDate string sorts correctly, better to use DateTime in VM if sorting is strict
+                    .ToList();
             }
             catch (Exception ex)
             {
@@ -93,14 +122,13 @@ namespace USJRLedger.Views.Adviser
             var button = sender as Button;
             var eventViewModel = button?.BindingContext as EventViewModel;
 
-            if (eventViewModel != null) 
+            if (eventViewModel != null)
             {
                 await Navigation.PushAsync(new EventDetailsPage(_authService, _dataService, eventViewModel.Id));
             }
         }
     }
 
-    // Helper class for the events list view
     public class EventViewModel
     {
         public string Id { get; set; }

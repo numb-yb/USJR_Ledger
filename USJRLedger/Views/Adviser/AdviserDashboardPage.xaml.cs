@@ -38,7 +38,7 @@ namespace USJRLedger.Views.Adviser
             base.OnAppearing();
             _isVisible = true;
 
-            // Subscribe to officer change messages
+            // Subscribe to officer changes to refresh dashboard if needed
             MessagingCenter.Subscribe<ManageOfficersPage>(this, "OfficersChanged", async (sender) =>
             {
                 await Task.Delay(150);
@@ -58,7 +58,6 @@ namespace USJRLedger.Views.Adviser
         {
             base.OnDisappearing();
             _isVisible = false;
-
             MessagingCenter.Unsubscribe<ManageOfficersPage>(this, "OfficersChanged");
         }
 
@@ -109,6 +108,7 @@ namespace USJRLedger.Views.Adviser
                 int pendingIncome = orgTransactions
                     .Count(t => t.Type == TransactionType.Income && t.ApprovalStatus == ApprovalStatus.Pending);
 
+                // Create recent notifications list
                 var notifications = orgTransactions
                     .Where(t => t.ApprovalStatus == ApprovalStatus.Pending)
                     .OrderByDescending(t => t.CreatedDate)
@@ -132,12 +132,15 @@ namespace USJRLedger.Views.Adviser
                         : "No Active School Year";
                     SchoolYearStatusLabel.TextColor = _currentSchoolYear != null ? Colors.Green : Colors.Red;
 
-                    //  Update balance and color
+                    // Update balance text and color
                     BalanceLabel.Text = $"₱ {balance:N2}";
                     BalanceLabel.TextColor = balance < 0 ? Colors.Red : Colors.Black;
 
+                    // Update counts
                     PendingExpensesLabel.Text = pendingExpenses.ToString();
                     PendingIncomeLabel.Text = pendingIncome.ToString();
+
+                    // Update list
                     NotificationListView.ItemsSource = notifications;
                 });
             }
@@ -148,7 +151,7 @@ namespace USJRLedger.Views.Adviser
             }
         }
 
-        #region Navigation
+        #region Navigation Methods
 
         private async void OnViewOrgProfileClicked(object sender, EventArgs e)
         {
@@ -208,72 +211,25 @@ namespace USJRLedger.Views.Adviser
             Application.Current.MainPage = new NavigationPage(new LoginPage(_authService));
         }
 
-        protected override void OnSizeAllocated(double width, double height)
+        private async void OnIncomeTrailClicked(object sender, EventArgs e)
         {
-            base.OnSizeAllocated(width, height);
+            if (_organization != null)
+                await Navigation.PushAsync(new IncomeTrailPage(_organization.Id));
+            else
+                await DisplayAlert("Error", "No organization assigned", "OK");
+        }
 
-            if (SummaryGrid == null || SummaryGrid.Children.Count < 4)
-                return;
-
-            SummaryGrid.RowDefinitions.Clear();
-            SummaryGrid.ColumnDefinitions.Clear();
-
-            double cardWidth = width > height ? width / 4.5 : width / 2.2;
-
-            if (width > height)
+        private async void OnExpenseBreakdownClicked(object sender, EventArgs e)
+        {
+            if (_organization != null)
             {
-                // Landscape: 1 row, 4 columns
-                SummaryGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                for (int i = 0; i < 4; i++)
-                    SummaryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-
-                for (int i = 0; i < 4; i++)
-                {
-                    if (SummaryGrid.Children[i] is Border border)
-                    {
-                        border.WidthRequest = cardWidth;
-                        border.HeightRequest = -1;
-                    }
-
-                    SummaryGrid.SetRow(SummaryGrid.Children[i], 0);
-                    SummaryGrid.SetColumn(SummaryGrid.Children[i], i);
-                }
+                // FIX: Passing _authService, _dataService, AND _organization.Id
+                await Navigation.PushAsync(new ExpenseBreakdownPage(_authService, _dataService, _organization.Id));
             }
             else
             {
-                // Portrait: 2x2 grid
-                for (int i = 0; i < 2; i++)
-                    SummaryGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                for (int i = 0; i < 2; i++)
-                    SummaryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-
-                for (int i = 0; i < 4; i++)
-                {
-                    if (SummaryGrid.Children[i] is Border border)
-                    {
-                        border.WidthRequest = cardWidth;
-                        border.HeightRequest = -1;
-                    }
-                }
-
-                SummaryGrid.SetRow(SummaryGrid.Children[0], 0);
-                SummaryGrid.SetColumn(SummaryGrid.Children[0], 0);
-
-                SummaryGrid.SetRow(SummaryGrid.Children[1], 0);
-                SummaryGrid.SetColumn(SummaryGrid.Children[1], 1);
-
-                SummaryGrid.SetRow(SummaryGrid.Children[2], 1);
-                SummaryGrid.SetColumn(SummaryGrid.Children[2], 0);
-
-                SummaryGrid.SetRow(SummaryGrid.Children[3], 1);
-                SummaryGrid.SetColumn(SummaryGrid.Children[3], 1);
+                await DisplayAlert("Error", "No organization assigned to your account", "OK");
             }
-
-            SummaryGrid.Dispatcher.Dispatch(() =>
-            {
-                SummaryGrid.WidthRequest = SummaryGrid.WidthRequest + 0.01;
-                SummaryGrid.WidthRequest = -1;
-            });
         }
 
         #endregion
