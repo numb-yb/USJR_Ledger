@@ -91,7 +91,7 @@
                                 <VerticalStackLayout VerticalOptions="Center" 
                                                      HorizontalOptions="Center"
                                                      Spacing="0">
-                                    <Label Text="Pending Inc." 
+                                    <Label Text="Pending Income" 
                                            FontSize="12" 
                                            TextColor="#0c5460" 
                                            HorizontalTextAlignment="Center"/>
@@ -110,7 +110,8 @@
                                 <VerticalStackLayout VerticalOptions="Center" 
                                                      HorizontalOptions="Center" 
                                                      Spacing="0">
-                                    <Label Text="Pending Exp." 
+
+                                    <Label Text="Pending Expenses" 
                                            FontSize="12" 
                                            TextColor="#856404" 
                                            HorizontalTextAlignment="Center"/>
