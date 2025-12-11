@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Maui.Controls;
 using USJRLedger.Models;
 using USJRLedger.Services;
+using USJRLedger.Views.Common; // Ensure this matches your details page namespace
 
 namespace USJRLedger.Views.Admin
 {
@@ -12,8 +13,8 @@ namespace USJRLedger.Views.Admin
         private readonly AuthService _authService;
         private readonly DataService _dataService;
         private readonly OrganizationService _organizationService;
-        private List<Organization> _organizations;
-        private bool _isActive; //  Track if page is visible
+
+        private bool _isPageLoaded = false;
 
         public ViewOrganizationsPage(AuthService authService, DataService dataService)
         {
@@ -23,17 +24,17 @@ namespace USJRLedger.Views.Admin
             _organizationService = new OrganizationService(dataService);
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
-            _isActive = true; //  Mark as active
-            _ = LoadOrganizationsAsync();
+            _isPageLoaded = true;
+            await LoadOrganizationsAsync();
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-            _isActive = false; // Prevent further UI updates
+            _isPageLoaded = false;
         }
 
         private async Task LoadOrganizationsAsync()
@@ -42,61 +43,51 @@ namespace USJRLedger.Views.Admin
             {
                 var organizations = await _organizationService.GetAllOrganizationsAsync();
 
-                if (!_isActive)
-                    return; //  Page is gone, stop safely
-
-                _organizations = organizations;
-                OrganizationsListView.ItemsSource = _organizations;
+                // Only update UI if page is still visible to prevent crashes
+                if (_isPageLoaded)
+                {
+                    OrganizationsListView.ItemsSource = organizations;
+                }
             }
             catch (Exception ex)
             {
-                if (_isActive)
+                if (_isPageLoaded)
                     await DisplayAlert("Error", $"Failed to load organizations: {ex.Message}", "OK");
             }
         }
 
         private async void OnUpdateStatusClicked(object sender, EventArgs e)
         {
-            var button = sender as Button;
-            var org = button?.BindingContext as Organization;
-
-            if (org == null)
-                return;
-
-            bool isActive = !org.IsActive;
-            string action = isActive ? "activate" : "deactivate";
-            string newStatus = isActive ? "Active" : "Inactive";
-
-            bool confirm = await DisplayAlert("Confirm",
-                $"Are you sure you want to {action} {org.Name}?\nStatus will change to: {newStatus}", "Yes", "No");
-
-            if (!confirm)
-                return;
-
-            try
+            if (sender is Button button && button.BindingContext is Organization org)
             {
-                await _organizationService.UpdateOrganizationStatusAsync(org.Id, isActive);
-                string statusMessage = isActive ? "activated" : "deactivated";
-                await DisplayAlert("Success", $"Organization {statusMessage} successfully", "OK");
+                bool isCurrentlyActive = org.IsActive;
+                string action = isCurrentlyActive ? "deactivate" : "activate";
 
-                if (_isActive)
-                    await LoadOrganizationsAsync(); // Only reload if still active
-            }
-            catch (Exception ex)
-            {
-                if (_isActive)
-                    await DisplayAlert("Error", $"Failed to update organization: {ex.Message}", "OK");
+                bool confirm = await DisplayAlert("Confirm",
+                    $"Are you sure you want to {action} {org.Name}?", "Yes", "No");
+
+                if (confirm)
+                {
+                    try
+                    {
+                        // Flip the status
+                        await _organizationService.UpdateOrganizationStatusAsync(org.Id, !isCurrentlyActive);
+                        await LoadOrganizationsAsync(); // Reload list
+                    }
+                    catch (Exception ex)
+                    {
+                        await DisplayAlert("Error", $"Update failed: {ex.Message}", "OK");
+                    }
+                }
             }
         }
 
         private async void OnViewDetailsClicked(object sender, EventArgs e)
         {
-            var button = sender as Button;
-            var org = button?.BindingContext as Organization;
-
-            if (org != null && _isActive)
+            if (sender is Button button && button.BindingContext is Organization org)
             {
-                await Navigation.PushAsync(new OrganizationDetailsPage(_authService, _dataService, org.Id));
+                // Navigate to details page
+                await Navigation.PushAsync(new OrganizationProfilePage(_authService, _dataService, org.Id));
             }
         }
     }

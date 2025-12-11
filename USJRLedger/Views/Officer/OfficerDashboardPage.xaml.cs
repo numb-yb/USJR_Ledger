@@ -1,26 +1,18 @@
 ﻿using USJRLedger.Models;
 using USJRLedger.Services;
 using USJRLedger.Views.Common;
+using USJRLedger.Views.Adviser; // Necessary to access Adviser pages
+using System.Collections.ObjectModel;
 
 namespace USJRLedger.Views.Officer
 {
-    public class TransactionItem
-    {
-        public string Id { get; set; }
-        public string Detail { get; set; }
-        public string DateString { get; set; }
-        public string AmountString { get; set; }
-        public string StatusString { get; set; }
-        public Color StatusColor { get; set; }
-        public string ReceiptPath { get; set; }
-    }
-
     public partial class OfficerDashboardPage : ContentPage
     {
         private readonly AuthService _authService;
         private readonly DataService _dataService;
+
+        // We need to store the organization object to pass its ID later
         private Organization _organization;
-        private SchoolYear _currentSchoolYear;
 
         public OfficerDashboardPage(AuthService authService, DataService dataService)
         {
@@ -28,196 +20,147 @@ namespace USJRLedger.Views.Officer
             _authService = authService;
             _dataService = dataService;
 
-            WelcomeLabel.Text = $"Welcome, {_authService.CurrentUser.Name}";
-            PositionLabel.Text = $"Position: {_authService.CurrentUser.Position}";
-
-            LoadDataAsync();
+            WelcomeLabel.Text = $"Welcome, {_authService.CurrentUser?.Name}";
+            PositionLabel.Text = $"Position: {_authService.CurrentUser?.Role}";
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
-            LoadDataAsync();
+            await LoadDashboardAsync();
         }
 
-        private async void LoadDataAsync()
+        private async Task LoadDashboardAsync()
         {
-            var organizations = await _dataService.LoadFromFileAsync<Organization>("organizations.json");
-            _organization = organizations.FirstOrDefault(o => o.Id == _authService.CurrentUser.OrganizationId);
-
-            if (_organization != null)
+            try
             {
-                OrganizationLabel.Text = $"Organization: {_organization.Name} ({_organization.Department})";
+                var orgs = await _dataService.LoadFromFileAsync<Organization>("organizations.json");
+                _organization = orgs.FirstOrDefault(o => o.Id == _authService.CurrentUser.OrganizationId);
 
-                var schoolYears = await _dataService.LoadFromFileAsync<SchoolYear>("schoolyears.json");
-                _currentSchoolYear = schoolYears.FirstOrDefault(sy => sy.OrganizationId == _organization.Id && sy.IsActive);
-
-                if (_currentSchoolYear != null)
+                if (_organization != null)
                 {
-                    SchoolYearLabel.Text = $"{_currentSchoolYear.Semester} {_currentSchoolYear.Year}";
-                }
-                else
-                {
-                    SchoolYearLabel.Text = "No Active School Year";
-                }
+                    OrganizationLabel.Text = $"Organization: {_organization.Name}";
 
-                var transactions = await _dataService.LoadFromFileAsync<Transaction>("transactions.json");
-                var orgTransactions = transactions.Where(t => t.OrganizationId == _organization.Id);
+                    // --- Load Balance & School Year Data ---
+                    var transactions = await _dataService.LoadFromFileAsync<Transaction>("transactions.json");
+                    var schoolYears = await _dataService.LoadFromFileAsync<SchoolYear>("schoolyears.json");
 
-                decimal totalIncome = orgTransactions
-                    .Where(t => t.Type == TransactionType.Income && t.ApprovalStatus == ApprovalStatus.Approved)
-                    .Sum(t => t.Amount);
+                    var activeSy = schoolYears.FirstOrDefault(sy => sy.OrganizationId == _organization.Id && sy.IsActive);
+                    SchoolYearLabel.Text = activeSy != null ? $"{activeSy.Semester} {activeSy.Year}" : "No Active SY";
 
-                decimal totalExpense = orgTransactions
-                    .Where(t => t.Type == TransactionType.Expense && t.ApprovalStatus == ApprovalStatus.Approved)
-                    .Sum(t => t.Amount);
+                    var orgTransactions = transactions.Where(t => t.OrganizationId == _organization.Id).ToList();
 
-                decimal balance = totalIncome - totalExpense;
-                BalanceLabel.Text = $"₱ {balance:N2}";
-                BalanceLabel.TextColor = balance < 0 ? Colors.Red : Colors.Black;
+                    // Calculate Totals
+                    decimal income = orgTransactions
+                        .Where(t => t.Type == TransactionType.Income && t.ApprovalStatus == ApprovalStatus.Approved)
+                        .Sum(t => t.Amount);
 
-                int pendingExpensesCount = orgTransactions.Count(t =>
-                    t.Type == TransactionType.Expense &&
-                    t.ApprovalStatus == ApprovalStatus.Pending &&
-                    t.CreatedBy == _authService.CurrentUser.Id);
+                    decimal expense = orgTransactions
+                        .Where(t => t.Type == TransactionType.Expense && t.ApprovalStatus == ApprovalStatus.Approved)
+                        .Sum(t => t.Amount);
 
-                PendingExpensesLabel.Text = pendingExpensesCount.ToString();
+                    BalanceLabel.Text = $"₱ {income - expense:N2}";
 
-                var recentTransactions = orgTransactions
-                    .Where(t => t.CreatedBy == _authService.CurrentUser.Id)
-                    .OrderByDescending(t => t.CreatedDate)
-                    .Take(10)
-                    .Select(t => new TransactionItem
-                    {
-                        Id = t.Id,
-                        Detail = $"{(t.Type == TransactionType.Income ? "Income" : "Expense")}: {t.Detail}",
-                        DateString = t.CreatedDate.ToString("MMM dd, yyyy"),
-                        AmountString = $"₱ {t.Amount:N2}",
-                        StatusString = t.ApprovalStatus.ToString(),
-                        StatusColor = t.ApprovalStatus switch
+                    // Calculate Pending Counts
+                    int pendingExp = orgTransactions.Count(t => t.Type == TransactionType.Expense && t.ApprovalStatus == ApprovalStatus.Pending);
+                    int pendingInc = orgTransactions.Count(t => t.Type == TransactionType.Income && t.ApprovalStatus == ApprovalStatus.Pending);
+
+                    PendingExpensesLabel.Text = pendingExp.ToString();
+                    PendingIncomeLabel.Text = pendingInc.ToString();
+
+                    // Load Recent List
+                    var recentList = orgTransactions
+                        .OrderByDescending(t => t.CreatedDate)
+                        .Take(5)
+                        .Select(t => new TransactionViewModel
                         {
-                            ApprovalStatus.Approved => Colors.Green,
-                            ApprovalStatus.Rejected => Colors.Red,
-                            _ => Colors.Orange
-                        },
-                        ReceiptPath = t.ReceiptPath // the path for viewing
-                    })
-                    .ToList();
+                            Detail = t.Detail,
+                            DateString = t.CreatedDate.ToString("MMM dd, yyyy"),
+                            AmountString = $"₱ {t.Amount:N2}",
+                            StatusString = t.ApprovalStatus.ToString(),
+                            HasReceipt = !string.IsNullOrEmpty(t.ReceiptPath),
+                            ReceiptPath = t.ReceiptPath
+                        })
+                        .ToList();
 
-                TransactionsListView.ItemsSource = recentTransactions;
-                TransactionsListView.SelectionChanged += OnTransactionSelected;
+                    TransactionsListView.ItemsSource = recentList;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                OrganizationLabel.Text = "No Organization Assigned";
-                SchoolYearLabel.Text = "N/A";
-                BalanceLabel.Text = "₱ 0.00";
-                BalanceLabel.TextColor = Colors.Black;
-                PendingExpensesLabel.Text = "0";
+                await DisplayAlert("Error", $"Dashboard Error: {ex.Message}", "OK");
             }
         }
 
-        // View Receipt on tap
-        private async void OnTransactionSelected(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.CurrentSelection.FirstOrDefault() is TransactionItem selectedTransaction)
-            {
-                TransactionsListView.SelectedItem = null; // Deselect
-
-                if (!string.IsNullOrEmpty(selectedTransaction.ReceiptPath))
-                {
-                    try
-                    {
-                        if (File.Exists(selectedTransaction.ReceiptPath))
-                        {
-                            // Load image bytes from file
-                            var imageBytes = await File.ReadAllBytesAsync(selectedTransaction.ReceiptPath);
-                            await Navigation.PushAsync(new ReceiptViewerPage(selectedTransaction.Detail, imageBytes));
-                        }
-                        else
-                        {
-                            // Show placeholder if file missing
-                            await Navigation.PushAsync(new ReceiptViewerPage(selectedTransaction.Detail, null));
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        await DisplayAlert("Error", "Failed to load receipt.", "OK");
-                    }
-                }
-                else
-                {
-                    await Navigation.PushAsync(new ReceiptViewerPage(selectedTransaction.Detail, null));
-                }
-            }
-        }
+        // --- NAVIGATION HANDLERS ---
 
         private async void OnViewOrgProfileClicked(object sender, EventArgs e)
         {
             if (_organization != null)
-            {
                 await Navigation.PushAsync(new OrganizationProfilePage(_authService, _dataService, _organization.Id));
-            }
-            else
-            {
-                await DisplayAlert("Error", "No organization assigned to your account", "OK");
-            }
         }
 
         private async void OnCreateEventClicked(object sender, EventArgs e)
         {
-            if (_organization != null)
-            {
-                if (_currentSchoolYear != null)
-                {
-                    await Navigation.PushAsync(new CreateEventPage(_authService, _dataService));
-                }
-                else
-                {
-                    await DisplayAlert("Error", "No active school year. Please contact your adviser.", "OK");
-                }
-            }
-            else
-            {
-                await DisplayAlert("Error", "No organization assigned to your account", "OK");
-            }
+            await Navigation.PushAsync(new CreateEventPage(_authService, _dataService));
         }
 
         private async void OnAddExpenseClicked(object sender, EventArgs e)
         {
-            if (_organization != null)
-            {
-                if (_currentSchoolYear != null)
-                {
-                    await Navigation.PushAsync(new AddExpensePage(_authService, _dataService));
-                }
-                else
-                {
-                    await DisplayAlert("Error", "No active school year. Please contact your adviser.", "OK");
-                }
-            }
-            else
-            {
-                await DisplayAlert("Error", "No organization assigned to your account", "OK");
-            }
+            await Navigation.PushAsync(new AddExpensePage(_authService, _dataService));
         }
 
         private async void OnAddIncomeClicked(object sender, EventArgs e)
         {
+            await Navigation.PushAsync(new AddIncomePage(_authService, _dataService));
+        }
+
+        // NEW BUTTON HANDLER: Expense Breakdown
+        private async void OnExpenseBreakdownClicked(object sender, EventArgs e)
+        {
             if (_organization != null)
             {
-                if (_currentSchoolYear != null)
-                {
-                    await Navigation.PushAsync(new AddIncomePage(_authService, _dataService));
-                }
-                else
-                {
-                    await DisplayAlert("Error", "No active school year. Please contact your adviser.", "OK");
-                }
+                // Passing all required services to the Adviser's breakdown page
+                await Navigation.PushAsync(new ExpenseBreakdownPage(_authService, _dataService, _organization.Id));
             }
             else
             {
-                await DisplayAlert("Error", "No organization assigned to your account", "OK");
+                await DisplayAlert("Error", "Organization not found.", "OK");
+            }
+        }
+
+        // NEW BUTTON HANDLER: Income Trail
+        private async void OnIncomeTrailClicked(object sender, EventArgs e)
+        {
+            if (_organization != null)
+            {
+                await Navigation.PushAsync(new IncomeTrailPage(_organization.Id));
+            }
+            else
+            {
+                await DisplayAlert("Error", "Organization not found.", "OK");
+            }
+        }
+
+        private async void OnViewReceiptClicked(object sender, EventArgs e)
+        {
+            var button = sender as Button;
+            var item = button?.BindingContext as TransactionViewModel;
+
+            if (item != null && !string.IsNullOrEmpty(item.ReceiptPath))
+            {
+                try
+                {
+                    byte[] data = await _dataService.LoadReceiptAsync(item.ReceiptPath);
+                    if (data != null)
+                        await Navigation.PushAsync(new ReceiptViewerPage(item.Detail, data));
+                    else
+                        await DisplayAlert("Error", "Receipt file not found.", "OK");
+                }
+                catch
+                {
+                    await DisplayAlert("Error", "Could not load receipt.", "OK");
+                }
             }
         }
 
@@ -226,40 +169,16 @@ namespace USJRLedger.Views.Officer
             _authService.Logout();
             Application.Current.MainPage = new NavigationPage(new LoginPage(_authService));
         }
+    }
 
-        private async void OnViewReceiptClicked(object sender, EventArgs e)
-        {
-            if (sender is Button button && button.BindingContext is TransactionItem transactionItem)
-            {
-                if (string.IsNullOrEmpty(transactionItem.ReceiptPath))
-                {
-                    await DisplayAlert("No Receipt", "This transaction does not have a receipt attached.", "OK");
-                    return;
-                }
-
-                try
-                {
-                    // Load the receipt file as bytes
-                    var filePath = transactionItem.ReceiptPath;
-                    if (File.Exists(filePath))
-                    {
-                        var receiptBytes = await File.ReadAllBytesAsync(filePath);
-
-                        // Navigate to ReceiptViewerPage
-                        await Navigation.PushAsync(new ReceiptViewerPage(transactionItem.Detail, receiptBytes));
-                    }
-                    else
-                    {
-                        await DisplayAlert("Missing Receipt", "The receipt file could not be found. Showing placeholder.", "OK");
-                        await Navigation.PushAsync(new ReceiptViewerPage(transactionItem.Detail, Array.Empty<byte>()));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    await DisplayAlert("Error", $"Failed to open receipt: {ex.Message}", "OK");
-                }
-            }
-        }
-
+    // Helper ViewModel for the list
+    public class TransactionViewModel
+    {
+        public string Detail { get; set; }
+        public string DateString { get; set; }
+        public string AmountString { get; set; }
+        public string StatusString { get; set; }
+        public bool HasReceipt { get; set; }
+        public string ReceiptPath { get; set; }
     }
 }

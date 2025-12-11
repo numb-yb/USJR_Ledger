@@ -1,100 +1,93 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:USJRLedger.Converters"
              x:Class="USJRLedger.Views.Admin.ViewOrganizationsPage"
-             Title="Organizations">
+             Title="Organizations"
+             BackgroundColor="#f5f5f7">
 
-    <VerticalStackLayout Padding="20" Spacing="20">
-        <Label Text="All Organizations"
-               FontSize="20"
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BoolToStatusConverter x:Key="BoolToStatusConverter" />
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+            <converters:BoolToActionConverter x:Key="BoolToActionConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, *" Padding="20" RowSpacing="15">
+
+        <Label Grid.Row="0" 
+               Text="All Organizations"
+               FontSize="22"
                FontAttributes="Bold"
-               Margin="0,0,0,8"/>
+               TextColor="Black"/>
 
-        <!--  Replaced ListView + Frame with CollectionView + Border -->
-        <CollectionView x:Name="OrganizationsListView"
-                        SelectionMode="None"
-                        ItemsLayout="VerticalList"
-                        VerticalOptions="FillAndExpand">
+        <CollectionView Grid.Row="1"
+                        x:Name="OrganizationsListView"
+                        SelectionMode="None">
+
+            <CollectionView.EmptyView>
+                <Label Text="No organizations found." 
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center" 
+                       TextColor="Gray"/>
+            </CollectionView.EmptyView>
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                   
-                    <Border Stroke="Gray"
-                            StrokeShape="RoundRectangle 12"
+                    <Border Stroke="LightGray"
+                            StrokeShape="RoundRectangle 10"
                             BackgroundColor="White"
-                            Padding="10"
-                            Margin="5">
+                            Padding="15"
+                            Margin="0,0,0,10">
 
-                       
-                        <Border.Shadow>
-                            <Shadow Brush="#00000022"
-                                    Offset="5,5"
-                                    Radius="8"/>
-                        </Border.Shadow>
+                        <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10">
 
-                        <Grid ColumnDefinitions="*,Auto"
-                              RowDefinitions="Auto,Auto,Auto"
-                              ColumnSpacing="8"
-                              RowSpacing="6">
-
-                            <!-- Organization Name -->
-                            <Label Grid.Row="0" 
-                                   Grid.Column="0"
+                            <Label Grid.Row="0" Grid.Column="0"
                                    Text="{Binding Name}"
                                    FontAttributes="Bold"
-                                   FontSize="18"/>
+                                   FontSize="18"
+                                   TextColor="Black"/>
 
-                            <!-- Department -->
-                            <Label Grid.Row="1"
-                                   Grid.Column="0"
+                            <Label Grid.Row="1" Grid.Column="0"
                                    Text="{Binding Department}"
                                    FontSize="14"
-                                   TextColor="Gray"/>
+                                   TextColor="Gray"
+                                   Margin="0,2,0,0"/>
 
-                            <!-- Status -->
-                            <HorizontalStackLayout Grid.Row="2" 
-                                                   Grid.Column="0"
-                                                   Spacing="5">
-                                <Label Text="Status:" FontAttributes="Bold"/>
+                            <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Spacing="5" Margin="0,5,0,0">
+                                <Label Text="Status:" FontAttributes="Bold" FontSize="12" TextColor="Black"/>
                                 <Label Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}"
-                                       TextColor="{Binding IsActive, Converter={StaticResource BoolToColorConverter}}"/>
+                                       TextColor="{Binding IsActive, Converter={StaticResource BoolToColorConverter}}"
+                                       FontSize="12"
+                                       FontAttributes="Bold"/>
                             </HorizontalStackLayout>
 
-                            <!-- Buttons -->
-                            <VerticalStackLayout
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                Grid.RowSpan="3"
-                                VerticalOptions="Center"
-                                Spacing="8">
-                                <!-- View Details button (Green) -->
-                                <Button 
-                                    Text="View Details"
-                                    BindingContext="{Binding .}"
-                                    Clicked="OnViewDetailsClicked"
-                                    BackgroundColor="#28a745"
-                                    TextColor="White"
-                                    CornerRadius="8"
-                                    HeightRequest="36"
-                                    FontSize="14"/>
+                            <VerticalStackLayout Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" 
+                                                 Spacing="8" VerticalOptions="Center">
 
-                                <!-- Deactivate button (Red) -->
-                                <Button 
-                                    Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
-                                    BindingContext="{Binding .}"
-                                    Clicked="OnUpdateStatusClicked"
-                                    BackgroundColor="#dc3545"
-                                    TextColor="White"
-                                    CornerRadius="8"
-                                    HeightRequest="36"
-                                    FontSize="14"/>
+                                <Button Text="View"
+                                        Clicked="OnViewDetailsClicked"
+                                        BackgroundColor="#28a745"
+                                        TextColor="White"
+                                        FontSize="12"
+                                        HeightRequest="35"
+                                        CornerRadius="5"
+                                        WidthRequest="90"/>
+
+                                <Button Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
+                                        Clicked="OnUpdateStatusClicked"
+                                        BackgroundColor="#dc3545"
+                                        TextColor="White"
+                                        FontSize="12"
+                                        HeightRequest="35"
+                                        CornerRadius="5"
+                                        WidthRequest="90"/>
                             </VerticalStackLayout>
-
-
                         </Grid>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-    </VerticalStackLayout>
+    </Grid>
 </ContentPage>
