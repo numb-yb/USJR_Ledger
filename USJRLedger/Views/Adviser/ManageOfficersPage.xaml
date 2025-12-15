@@ -16,20 +16,17 @@
         <VerticalStackLayout Padding="20" 
                              Spacing="20">
 
-            <!-- Add Officer Section -->
-            <Border Stroke="Gray" 
+            <Border Stroke="Gray"
                     StrokeThickness="1" 
-                    Padding="15" 
-                    StrokeShape="RoundRectangle 8"
-                    Margin="0,0,0,10">
-                <VerticalStackLayout 
-                    Spacing="15">
-                    <Label Text="Add New Officer" 
-                           FontSize="20"
+                    Padding="15"
+                    StrokeShape="RoundRectangle 8">
+                <VerticalStackLayout Spacing="15">
+                    <Label x:Name="FormTitleLabel" 
+                           Text="Add New Officer" 
+                           FontSize="20" 
                            FontAttributes="Bold" />
 
-                    <VerticalStackLayout 
-                        Spacing="5">
+                    <VerticalStackLayout Spacing="5">
                         <Label Text="Full Name" />
                         <Entry x:Name="NameEntry" 
                                Placeholder="Enter officer's full name" />
@@ -41,34 +38,43 @@
                                Placeholder="Enter student ID" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout 
-                        Spacing="5">
+                    <VerticalStackLayout Spacing="5">
                         <Label Text="Position" />
                         <Entry x:Name="PositionEntry"
-                               Placeholder="Enter position (e.g. President, Treasurer)" />
+                               Placeholder="Enter position (e.g. President)" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout 
-                        Spacing="5">
-                        <Label Text="Temporary Password" />
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Password" />
                         <Entry x:Name="PasswordEntry" 
-                               Placeholder="Enter temporary password"
+                               Placeholder="Leave blank to keep existing password" 
                                IsPassword="True" />
                     </VerticalStackLayout>
 
-                    <Button Text="Add Officer"
-                            Clicked="OnAddOfficerClicked"
-                            HorizontalOptions="End"
-                            BackgroundColor="#28a745"
-                            TextColor="White"
-                            CornerRadius="6" />
+                    <HorizontalStackLayout Spacing="10" 
+                                           HorizontalOptions="End">
+
+                        <Button x:Name="CancelButton"
+                                Text="Cancel"
+                                Clicked="OnCancelEditClicked"
+                                BackgroundColor="Gray"
+                                TextColor="White"
+                                CornerRadius="6"
+                                IsVisible="False"/>
+
+                        <Button x:Name="SaveButton"
+                                Text="Add Officer"
+                                Clicked="OnSaveOfficerClicked"
+                                BackgroundColor="#28a745"
+                                TextColor="White"
+                                CornerRadius="6" />
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Current Officers Section -->
             <Border Stroke="Gray" 
-                    StrokeThickness="1"
-                    Padding="15"
+                    StrokeThickness="1" 
+                    Padding="15" 
                     StrokeShape="RoundRectangle 8">
                 <VerticalStackLayout 
                     Spacing="15">
@@ -76,26 +82,24 @@
                            FontSize="20"
                            FontAttributes="Bold" />
 
-                    <ListView x:Name="OfficersListView"
-                              HasUnevenRows="True"
-                              SeparatorVisibility="None">
+                    <ListView x:Name="OfficersListView" 
+                              HasUnevenRows="True" 
+                              SeparatorVisibility="None" 
+                              SelectionMode="None">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <ViewCell>
                                     <Border Stroke="Gray" 
-                                            StrokeThickness="1" 
+                                            StrokeThickness="1"
                                             Padding="10" Margin="5" 
                                             StrokeShape="RoundRectangle 8">
                                         <Grid RowDefinitions="Auto,Auto,Auto,Auto">
-
-                                            <Label Grid.Row="0"
+                                            <Label Grid.Row="0" 
                                                    Text="{Binding Name}"
-                                                   FontAttributes="Bold"
-                                                   FontSize="16" />
-
-                                            <Label Grid.Row="1"
-                                                   Text="{Binding Position}"
-                                                   FontSize="14"
+                                                   FontAttributes="Bold" FontSize="16" />
+                                            <Label Grid.Row="1" 
+                                                   Text="{Binding Position}" 
+                                                   FontSize="14" 
                                                    TextColor="Gray" />
 
                                             <StackLayout Grid.Row="2"
@@ -106,25 +110,37 @@
                                                 <Label Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" />
                                             </StackLayout>
 
-                                            <StackLayout Grid.Row="3" 
-                                                         Orientation="Horizontal"
+                                            <StackLayout Grid.Row="3" Orientation="Horizontal"
                                                          Spacing="10" 
-                                                         HorizontalOptions="End">
+                                                         HorizontalOptions="End" 
+                                                         Margin="0,5,0,0">
+
+                                                <Button Text="Edit"
+                                                        BackgroundColor="green"
+                                                        TextColor="White"
+                                                        CornerRadius="6"
+                                                        HeightRequest="35"
+                                                        FontSize="12"
+                                                        Clicked="OnEditOfficerClicked"
+                                                        BindingContext="{Binding .}" />
+
                                                 <Button Text="{Binding IsActive, Converter={StaticResource BoolToActionConverter}}"
                                                         BackgroundColor="#8B0000"
                                                         TextColor="White"
                                                         CornerRadius="6"
                                                         HeightRequest="35"
-                                                        BindingContext="{Binding .}"
-                                                        Clicked="OnToggleStatusClicked" />
+                                                        FontSize="12"
+                                                        Clicked="OnToggleStatusClicked"
+                                                        BindingContext="{Binding .}" />
 
                                                 <Button Text="Delete"
                                                         BackgroundColor="#D32F2F"
                                                         TextColor="White"
                                                         CornerRadius="6"
                                                         HeightRequest="35"
-                                                        BindingContext="{Binding .}"
-                                                        Clicked="OnDeleteOfficerClicked" />
+                                                        FontSize="12"
+                                                        Clicked="OnDeleteOfficerClicked"
+                                                        BindingContext="{Binding .}" />
                                             </StackLayout>
                                         </Grid>
                                     </Border>

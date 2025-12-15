@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System; // Added for Exception types
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using USJRLedger.Models;
@@ -41,7 +42,6 @@ namespace USJRLedger.Services
         {
             var users = await _dataService.LoadFromFileAsync<User>("users.json");
 
-            // Check if username already exists
             if (users.Any(u => u.Username == username))
             {
                 throw new InvalidOperationException("Username already exists");
@@ -64,11 +64,10 @@ namespace USJRLedger.Services
         }
 
         public async Task<User> CreateOfficerAsync(string name, string username, string tempPassword,
-                                                string organizationId, string position)
+                                                 string organizationId, string position)
         {
             var users = await _dataService.LoadFromFileAsync<User>("users.json");
 
-            // Check if username already exists
             if (users.Any(u => u.Username == username))
             {
                 throw new InvalidOperationException("Username already exists");
@@ -91,6 +90,29 @@ namespace USJRLedger.Services
             return newOfficer;
         }
 
+        // --- NEW METHOD ADDED HERE ---
+        public async Task UpdateUserAsync(User updatedUser)
+        {
+            var users = await _dataService.LoadFromFileAsync<User>("users.json");
+            var existingUser = users.FirstOrDefault(u => u.Id == updatedUser.Id);
+
+            if (existingUser != null)
+            {
+                existingUser.Name = updatedUser.Name;
+                existingUser.Username = updatedUser.Username;
+                existingUser.Position = updatedUser.Position;
+
+                // Only update password if changed
+                if (!string.IsNullOrEmpty(updatedUser.Password))
+                {
+                    existingUser.Password = updatedUser.Password;
+                }
+
+                await _dataService.SaveToFileAsync(users, "users.json");
+            }
+        }
+        // -----------------------------
+
         public async Task UpdateUserStatusAsync(string id, bool isActive)
         {
             var users = await _dataService.LoadFromFileAsync<User>("users.json");
@@ -102,6 +124,7 @@ namespace USJRLedger.Services
                 await _dataService.SaveToFileAsync(users, "users.json");
             }
         }
+
         public async Task DeleteUserAsync(string id)
         {
             var users = await _dataService.LoadFromFileAsync<User>("users.json");
@@ -113,8 +136,5 @@ namespace USJRLedger.Services
                 await _dataService.SaveToFileAsync(users, "users.json");
             }
         }
-
-
-
     }
 }

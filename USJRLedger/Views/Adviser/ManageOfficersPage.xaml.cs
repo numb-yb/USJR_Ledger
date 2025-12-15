@@ -1,6 +1,10 @@
 using USJRLedger.Models;
 using USJRLedger.Services;
 using Microsoft.Maui.Controls;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
+using System;
 
 namespace USJRLedger.Views.Adviser
 {
@@ -11,6 +15,9 @@ namespace USJRLedger.Views.Adviser
         private readonly UserService _userService;
         private readonly string _organizationId;
         private List<User> _officers;
+
+        // Track the officer being edited (null means we are in "Add Mode")
+        private User _editingOfficer = null;
 
         public ManageOfficersPage(AuthService authService, DataService dataService)
         {
@@ -41,43 +48,112 @@ namespace USJRLedger.Views.Adviser
             }
         }
 
-        private async void OnAddOfficerClicked(object sender, EventArgs e)
+        // 1. Handle "Save" (Add or Update)
+        private async void OnSaveOfficerClicked(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(NameEntry.Text) ||
                 string.IsNullOrWhiteSpace(StudentIdEntry.Text) ||
-                string.IsNullOrWhiteSpace(PositionEntry.Text) ||
-                string.IsNullOrWhiteSpace(PasswordEntry.Text))
+                string.IsNullOrWhiteSpace(PositionEntry.Text))
             {
-                await DisplayAlert("Error", "Please fill in all fields.", "OK");
+                await DisplayAlert("Error", "Please fill in Name, ID, and Position.", "OK");
                 return;
             }
 
             try
             {
-                await _userService.CreateOfficerAsync(
-                    NameEntry.Text,
-                    StudentIdEntry.Text,
-                    PasswordEntry.Text,
-                    _organizationId,
-                    PositionEntry.Text);
+                if (_editingOfficer == null)
+                {
+                    // --- CREATE NEW OFFICER ---
+                    if (string.IsNullOrWhiteSpace(PasswordEntry.Text))
+                    {
+                        await DisplayAlert("Error", "Password is required for new officers.", "OK");
+                        return;
+                    }
 
-                await DisplayAlert("Success", "Officer added successfully!", "OK");
+                    await _userService.CreateOfficerAsync(
+                        NameEntry.Text,
+                        StudentIdEntry.Text,
+                        PasswordEntry.Text,
+                        _organizationId,
+                        PositionEntry.Text);
 
-                // Notify dashboard that officers changed
+                    await DisplayAlert("Success", "Officer added successfully!", "OK");
+                }
+                else
+                {
+                    // --- UPDATE EXISTING OFFICER ---
+                    _editingOfficer.Name = NameEntry.Text;
+                    _editingOfficer.Username = StudentIdEntry.Text;
+                    _editingOfficer.Position = PositionEntry.Text; // Ensure User model has Position property
+
+                    // Only update password if user typed something
+                    if (!string.IsNullOrWhiteSpace(PasswordEntry.Text))
+                    {
+                        _editingOfficer.Password = PasswordEntry.Text;
+                    }
+
+                    await _userService.UpdateUserAsync(_editingOfficer);
+                    await DisplayAlert("Success", "Officer updated successfully!", "OK");
+                }
+
+                // Notify dashboard
                 MessagingCenter.Send(this, "OfficersChanged");
 
-                // Clear fields
-                NameEntry.Text = string.Empty;
-                StudentIdEntry.Text = string.Empty;
-                PasswordEntry.Text = string.Empty;
-                PositionEntry.Text = string.Empty;
-
+                // Reset UI
+                ResetForm();
                 await LoadOfficersAsync();
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Error", $"Failed to add officer: {ex.Message}", "OK");
+                await DisplayAlert("Error", $"Operation failed: {ex.Message}", "OK");
             }
+        }
+
+        // 2. Handle "Edit" Click
+        private void OnEditOfficerClicked(object sender, EventArgs e)
+        {
+            if (sender is Button button && button.BindingContext is User officer)
+            {
+                _editingOfficer = officer;
+
+                // Populate Form
+                NameEntry.Text = officer.Name;
+                StudentIdEntry.Text = officer.Username;
+                PositionEntry.Text = officer.Position; // Or RoleDescription if Position property doesn't exist
+                PasswordEntry.Text = ""; // Clear password field for security
+                PasswordEntry.Placeholder = "Enter new password to change";
+
+                // Update UI to "Edit Mode"
+                FormTitleLabel.Text = "Edit Officer";
+                SaveButton.Text = "Update Officer";
+                SaveButton.BackgroundColor = Colors.Green;
+                CancelButton.IsVisible = true;
+
+                // Scroll to top to see the form
+                // (Optional: this.Content.ScrollToAsync(0, 0, true));
+            }
+        }
+
+        // 3. Handle "Cancel" Click
+        private void OnCancelEditClicked(object sender, EventArgs e)
+        {
+            ResetForm();
+        }
+
+        private void ResetForm()
+        {
+            _editingOfficer = null;
+            NameEntry.Text = string.Empty;
+            StudentIdEntry.Text = string.Empty;
+            PositionEntry.Text = string.Empty;
+            PasswordEntry.Text = string.Empty;
+            PasswordEntry.Placeholder = "Enter temporary password";
+
+            // Reset UI to "Add Mode"
+            FormTitleLabel.Text = "Add New Officer";
+            SaveButton.Text = "Add Officer";
+            SaveButton.BackgroundColor = Color.FromArgb("#28a745"); // Green
+            CancelButton.IsVisible = false;
         }
 
         private async void OnToggleStatusClicked(object sender, EventArgs e)
@@ -87,26 +163,11 @@ namespace USJRLedger.Views.Adviser
                 bool newStatus = !officer.IsActive;
                 string action = newStatus ? "activate" : "deactivate";
 
-                bool confirm = await DisplayAlert("Confirm Action",
-                    $"Are you sure you want to {action} {officer.Name}?",
-                    "Yes", "No");
-
-                if (!confirm)
-                    return;
-
-                try
+                if (await DisplayAlert("Confirm", $"Are you sure you want to {action} {officer.Name}?", "Yes", "No"))
                 {
                     await _userService.UpdateUserStatusAsync(officer.Id, newStatus);
-                    await DisplayAlert("Success", $"Officer {action}d successfully!", "OK");
-
-                    // Notify dashboard in case totals or roles change
                     MessagingCenter.Send(this, "OfficersChanged");
-
                     await LoadOfficersAsync();
-                }
-                catch (Exception ex)
-                {
-                    await DisplayAlert("Error", $"Failed to update officer: {ex.Message}", "OK");
                 }
             }
         }
@@ -115,26 +176,11 @@ namespace USJRLedger.Views.Adviser
         {
             if (sender is Button button && button.BindingContext is User officer)
             {
-                bool confirm = await DisplayAlert("Confirm Deletion",
-                    $"Are you sure you want to delete officer {officer.Name}?",
-                    "Yes", "No");
-
-                if (!confirm)
-                    return;
-
-                try
+                if (await DisplayAlert("Delete", $"Delete officer {officer.Name}?", "Yes", "No"))
                 {
                     await _userService.DeleteUserAsync(officer.Id);
-                    await DisplayAlert("Success", "Officer deleted successfully!", "OK");
-
-                    //Notify dashboard so it refreshes safely
                     MessagingCenter.Send(this, "OfficersChanged");
-
                     await LoadOfficersAsync();
-                }
-                catch (Exception ex)
-                {
-                    await DisplayAlert("Error", $"Failed to delete officer: {ex.Message}", "OK");
                 }
             }
         }
