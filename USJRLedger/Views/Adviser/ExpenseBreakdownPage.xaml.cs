@@ -12,16 +12,19 @@ namespace USJRLedger.Views.Adviser
     {
         private readonly AuthService _authService;
         private readonly DataService _dataService;
+        private readonly UserService _userService; // Added Service
         private readonly string _organizationId;
 
         private List<Transaction> _allTransactions = new List<Transaction>();
         private List<SchoolYear> _allSchoolYears = new List<SchoolYear>();
+        private Dictionary<string, string> _userNames = new Dictionary<string, string>(); // Map ID -> Name
 
         public ExpenseBreakdownPage(AuthService authService, DataService dataService, string organizationId)
         {
             InitializeComponent();
             _authService = authService;
             _dataService = dataService;
+            _userService = new UserService(dataService); // Initialize
             _organizationId = organizationId;
 
             _ = InitializeDataAsync();
@@ -34,7 +37,11 @@ namespace USJRLedger.Views.Adviser
                 var transactions = await _dataService.LoadFromFileAsync<Transaction>("transactions.json");
                 var loadedYears = await _dataService.LoadFromFileAsync<SchoolYear>("schoolyears.json");
 
-                // Load ALL Expenses for this Org (Approved & Rejected)
+                // 1. Load Users to resolve names (This is the key step)
+                var users = await _userService.GetUsersByOrganizationAsync(_organizationId);
+                _userNames = users.ToDictionary(u => u.Id, u => u.Name);
+
+                // 2. Load Transactions
                 _allTransactions = transactions
                     .Where(t => t.OrganizationId == _organizationId &&
                                 t.Type == TransactionType.Expense)
@@ -45,7 +52,7 @@ namespace USJRLedger.Views.Adviser
                     .OrderByDescending(sy => sy.StartDate)
                     .ToList();
 
-                // Get DISTINCT Years (e.g. "2026-2027")
+                // 3. Setup Picker
                 var distinctYears = _allSchoolYears
                     .Select(sy => sy.Year)
                     .Distinct()
@@ -63,13 +70,6 @@ namespace USJRLedger.Views.Adviser
                 {
                     SchoolYearPicker.SelectedIndex = 0;
                 }
-                else
-                {
-                    GrandTotalLabel.Text = "\u20B1 0.00";
-                    GeneralTotalLabel.Text = "\u20B1 0.00";
-                    EventTotalLabel.Text = "\u20B1 0.00";
-                    RejectedExpensesList.ItemsSource = null;
-                }
             }
             catch (Exception ex)
             {
@@ -80,10 +80,9 @@ namespace USJRLedger.Views.Adviser
         private void OnSchoolYearChanged(object sender, EventArgs e)
         {
             var selectedYearString = SchoolYearPicker.SelectedItem as string;
-
             if (string.IsNullOrEmpty(selectedYearString)) return;
 
-            // 1. Find ALL matching SchoolYear IDs for this string (Merging semesters)
+            // 1. Find matching School Year IDs
             var matchingSyIds = _allSchoolYears
                 .Where(sy => sy.Year == selectedYearString)
                 .Select(sy => sy.Id)
@@ -94,27 +93,33 @@ namespace USJRLedger.Views.Adviser
                 .Where(t => matchingSyIds.Contains(t.SchoolYearId))
                 .ToList();
 
-            // 3. Separate APPROVED expenses
+            // 3. Separate Approved
             var approvedExpenses = yearTransactions
                 .Where(t => t.ApprovalStatus == ApprovalStatus.Approved)
                 .ToList();
 
-            // 4. Update Rejected Expenses List
+            // 4. Map Rejected Expenses (With Sender Name)
             var rejectedExpenses = yearTransactions
                 .Where(t => t.ApprovalStatus == ApprovalStatus.Rejected)
-                .Select(t => new RejectedExpenseSummary
-                {
-                    Detail = t.Detail,
-                    Amount = t.Amount,
-                    DateString = t.CreatedDate.ToString("MMM dd, yyyy"),
-                    Category = t.Category.ToString()
+                .Select(t => {
+                    // Look up the name in our dictionary, or default to "Unknown"
+                    string sender = _userNames.ContainsKey(t.CreatedBy) ? _userNames[t.CreatedBy] : "Unknown";
+
+                    return new RejectedExpenseSummary
+                    {
+                        Detail = t.Detail,
+                        Amount = t.Amount,
+                        DateString = t.CreatedDate.ToString("MMM dd, yyyy"),
+                        Category = t.Category.ToString(),
+                        SenderName = sender // Set Name here
+                    };
                 })
                 .OrderByDescending(r => r.DateString)
                 .ToList();
 
             RejectedExpensesList.ItemsSource = rejectedExpenses;
 
-            // 5. Update Totals (Cards)
+            // 5. Update Totals
             decimal grandTotal = approvedExpenses.Sum(t => t.Amount);
             GrandTotalLabel.Text = $"\u20B1 {grandTotal:N2}";
 
@@ -131,8 +136,7 @@ namespace USJRLedger.Views.Adviser
             EventTotalLabel.Text = $"\u20B1 {eventExpenses:N2}";
         }
 
-        // --- NAVIGATION HANDLERS ---
-
+        // Navigation Handlers
         private async void OnGeneralExpenseTapped(object sender, EventArgs e)
         {
             var selectedYearString = SchoolYearPicker.SelectedItem as string;
@@ -166,11 +170,13 @@ namespace USJRLedger.Views.Adviser
         }
     }
 
+    // Helper Class
     public class RejectedExpenseSummary
     {
         public string Detail { get; set; }
         public decimal Amount { get; set; }
         public string DateString { get; set; }
         public string Category { get; set; }
+        public string SenderName { get; set; }
     }
 }

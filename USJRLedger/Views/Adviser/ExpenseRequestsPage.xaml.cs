@@ -1,7 +1,10 @@
 ﻿using USJRLedger.Models;
 using USJRLedger.Services;
 using USJRLedger.Views.Common;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace USJRLedger.Views.Adviser
 {
@@ -14,54 +17,72 @@ namespace USJRLedger.Views.Adviser
         private readonly EventService _eventService;
         private readonly string _organizationId;
 
-        private List<Transaction> _pendingExpenses;
+        // Use ObservableCollection so the UI updates automatically when items are removed
+        private ObservableCollection<ExpenseViewModel> _pendingExpenses;
 
         public ExpenseRequestsPage(AuthService authService, DataService dataService)
         {
             InitializeComponent();
+
             _authService = authService;
             _dataService = dataService;
             _transactionService = new TransactionService(dataService);
             _userService = new UserService(dataService);
             _eventService = new EventService(dataService);
             _organizationId = _authService.CurrentUser.OrganizationId;
-
-            LoadPendingExpensesAsync();
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
-            LoadPendingExpensesAsync();
+            await LoadPendingExpensesAsync();
         }
 
         private async Task LoadPendingExpensesAsync()
         {
             try
             {
-                _pendingExpenses = await _transactionService.GetPendingExpensesAsync(_organizationId);
+                var transactions = await _dataService.LoadFromFileAsync<Transaction>("transactions.json");
 
-                var pendingExpenseViewModels = new List<ExpenseViewModel>();
+                // Filter for pending expenses
+                var rawList = transactions
+                    .Where(t => t.OrganizationId == _organizationId &&
+                                t.Type == TransactionType.Expense &&
+                                t.ApprovalStatus == ApprovalStatus.Pending)
+                    .ToList();
 
-                foreach (var expense in _pendingExpenses)
+                var viewModels = new List<ExpenseViewModel>();
+
+                foreach (var expense in rawList)
                 {
                     var officer = await _userService.GetUserByIdAsync(expense.CreatedBy);
+                    string eventName = "-";
 
-                    string eventName = "None";
                     if (!string.IsNullOrEmpty(expense.EventId))
                     {
                         var eventItem = await _eventService.GetEventByIdAsync(expense.EventId);
-                        eventName = eventItem != null && !string.IsNullOrEmpty(eventItem.Name)
-                            ? eventItem.Name
-                            : "None";
+                        eventName = eventItem?.Name ?? "-";
                     }
 
-                    pendingExpenseViewModels.Add(new ExpenseViewModel
+                    // --- LOGIC: Handle General Expense Title ---
+                    string displayTitle = expense.Detail;
+
+                    if (expense.Category == TransactionCategory.General)
+                    {
+                        displayTitle = "General Expense";
+                    }
+                    else if (string.IsNullOrEmpty(displayTitle))
+                    {
+                        displayTitle = expense.Category.ToString();
+                    }
+                    // ------------------------------------------
+
+                    viewModels.Add(new ExpenseViewModel
                     {
                         Id = expense.Id,
-                        Detail = expense.Detail,
+                        Detail = displayTitle,
                         Amount = expense.Amount,
-                        AmountString = $"₱ {expense.Amount:N2}",
+                        AmountString = $"\u20B1 {expense.Amount:N2}", // Peso Sign
                         Category = expense.Category.ToString(),
                         RequestedBy = officer?.Name ?? "Unknown",
                         DateRequested = expense.CreatedDate.ToString("MMM dd, yyyy"),
@@ -71,104 +92,121 @@ namespace USJRLedger.Views.Adviser
                     });
                 }
 
-                ExpensesCollectionView.ItemsSource = pendingExpenseViewModels
-                    .OrderByDescending(e => e.DateRequested)
-                    .ToList();
+                // Sort by date (Newest first) and bind
+                _pendingExpenses = new ObservableCollection<ExpenseViewModel>(
+                    viewModels.OrderByDescending(e => e.DateRequested)
+                );
 
-                bool hasItems = pendingExpenseViewModels.Any();
-                NoExpensesLabel.IsVisible = !hasItems;
-                ExpensesCollectionView.IsVisible = hasItems;
+                ExpensesCollectionView.ItemsSource = _pendingExpenses;
+                UpdateVisibility();
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Error", $"Failed to load expense requests: {ex.Message}", "OK");
+                await DisplayAlert("Error", $"Failed to load expenses: {ex.Message}", "OK");
+            }
+        }
+
+        private void UpdateVisibility()
+        {
+            if (_pendingExpenses == null || _pendingExpenses.Count == 0)
+            {
+                NoExpensesLabel.IsVisible = true;
+                ExpensesCollectionView.IsVisible = false;
+            }
+            else
+            {
+                NoExpensesLabel.IsVisible = false;
+                ExpensesCollectionView.IsVisible = true;
             }
         }
 
         private async void OnApproveClicked(object sender, EventArgs e)
         {
-            if (sender is Button button && button.BindingContext is ExpenseViewModel expense)
+            var button = sender as Button;
+            var expense = button?.BindingContext as ExpenseViewModel;
+            if (expense == null) return;
+
+            bool confirm = await DisplayAlert("Confirm",
+                $"Approve expense: {expense.Detail} - {expense.AmountString}?",
+                "Yes", "No");
+
+            if (confirm)
             {
-                bool confirm = await DisplayAlert("Confirm",
-                    $"Are you sure you want to approve this expense:\n\n{expense.Detail}\n{expense.AmountString}?",
-                    "Yes", "No");
-
-                if (!confirm)
-                    return;
-
                 try
                 {
                     await _transactionService.UpdateTransactionApprovalAsync(
                         expense.Id, ApprovalStatus.Approved, _authService.CurrentUser.Id);
 
-                    await DisplayAlert("Success", "Expense approved successfully.", "OK");
-                    await LoadPendingExpensesAsync();
+                    await DisplayAlert("Success", "Expense approved.", "OK");
+
+                    // Remove from list immediately
+                    _pendingExpenses.Remove(expense);
+                    UpdateVisibility();
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", $"Failed to approve expense: {ex.Message}", "OK");
+                    await DisplayAlert("Error", $"Failed: {ex.Message}", "OK");
                 }
             }
         }
 
         private async void OnRejectClicked(object sender, EventArgs e)
         {
-            if (sender is Button button && button.BindingContext is ExpenseViewModel expense)
+            var button = sender as Button;
+            var expense = button?.BindingContext as ExpenseViewModel;
+            if (expense == null) return;
+
+            bool confirm = await DisplayAlert("Confirm",
+                $"Reject expense: {expense.Detail} - {expense.AmountString}?",
+                "Yes", "No");
+
+            if (confirm)
             {
-                bool confirm = await DisplayAlert("Confirm",
-                    $"Are you sure you want to reject this expense:\n\n{expense.Detail}\n{expense.AmountString}?",
-                    "Yes", "No");
-
-                if (!confirm)
-                    return;
-
                 try
                 {
                     await _transactionService.UpdateTransactionApprovalAsync(
                         expense.Id, ApprovalStatus.Rejected, _authService.CurrentUser.Id);
 
-                    await DisplayAlert("Success", "Expense rejected successfully.", "OK");
-                    await LoadPendingExpensesAsync();
+                    await DisplayAlert("Success", "Expense rejected.", "OK");
+
+                    // Remove from list immediately
+                    _pendingExpenses.Remove(expense);
+                    UpdateVisibility();
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", $"Failed to reject expense: {ex.Message}", "OK");
+                    await DisplayAlert("Error", $"Failed: {ex.Message}", "OK");
                 }
             }
         }
 
         private async void OnViewReceiptClicked(object sender, EventArgs e)
         {
-            if (sender is Button button && button.BindingContext is ExpenseViewModel expense)
-            {
-                if (string.IsNullOrEmpty(expense.ReceiptPath))
-                {
-                    await DisplayAlert("Error", "No receipt found for this expense.", "OK");
-                    return;
-                }
+            var button = sender as Button;
+            var expense = button?.BindingContext as ExpenseViewModel;
 
+            if (expense != null && !string.IsNullOrEmpty(expense.ReceiptPath))
+            {
                 try
                 {
                     byte[] receiptData = await _dataService.LoadReceiptAsync(expense.ReceiptPath);
-
                     if (receiptData != null)
                     {
                         await Navigation.PushAsync(new ReceiptViewerPage(expense.Detail, receiptData));
                     }
                     else
                     {
-                        await DisplayAlert("Error", "Failed to load receipt data.", "OK");
+                        await DisplayAlert("Error", "Receipt file not found.", "OK");
                     }
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", $"Failed to view receipt: {ex.Message}", "OK");
+                    await DisplayAlert("Error", $"Cannot view receipt: {ex.Message}", "OK");
                 }
             }
         }
     }
 
-    // ViewModel for UI Binding
     public class ExpenseViewModel
     {
         public string Id { get; set; }

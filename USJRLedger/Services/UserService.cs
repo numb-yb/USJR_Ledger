@@ -90,7 +90,8 @@ namespace USJRLedger.Services
             return newOfficer;
         }
 
-        // --- NEW METHOD ADDED HERE ---
+        // Inside UserService.cs
+
         public async Task UpdateUserAsync(User updatedUser)
         {
             var users = await _dataService.LoadFromFileAsync<User>("users.json");
@@ -102,7 +103,10 @@ namespace USJRLedger.Services
                 existingUser.Username = updatedUser.Username;
                 existingUser.Position = updatedUser.Position;
 
-                // Only update password if changed
+                // --- ADD THIS LINE ---
+                existingUser.OrganizationId = updatedUser.OrganizationId;
+                // ---------------------
+
                 if (!string.IsNullOrEmpty(updatedUser.Password))
                 {
                     existingUser.Password = updatedUser.Password;

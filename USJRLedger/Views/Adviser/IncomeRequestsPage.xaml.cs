@@ -62,12 +62,27 @@ namespace USJRLedger.Views.Adviser
                         eventName = eventItem?.Name ?? "-";
                     }
 
+                    // --- NEW LOGIC HERE ---
+                    string displayTitle = income.Detail;
+
+                    // If the category is General, force the title to be "General Income"
+                    if (income.Category == TransactionCategory.General)
+                    {
+                        displayTitle = "General Income";
+                    }
+                    // Fallback: If detail is empty (and not general), use the Category name
+                    else if (string.IsNullOrEmpty(displayTitle))
+                    {
+                        displayTitle = income.Category.ToString();
+                    }
+                    // ---------------------
+
                     pendingIncomeViewModels.Add(new IncomeViewModel
                     {
                         Id = income.Id,
-                        Detail = income.Detail,
+                        Detail = displayTitle, // Use the variable we just calculated
                         Amount = income.Amount,
-                        AmountString = $"\u20B1 {income.Amount:N2}",
+                        AmountString = $"\u20B1 {income.Amount:N2}", // Using Peso Sign
                         Category = income.Category.ToString(),
                         RequestedBy = officer?.Name ?? "Unknown",
                         DateRequested = income.CreatedDate.ToString("MMM dd, yyyy"),
@@ -77,7 +92,7 @@ namespace USJRLedger.Views.Adviser
                     });
                 }
 
-                // FIX: Use ObservableCollection for dynamic updates
+                // Sort by newest first
                 var sortedList = new ObservableCollection<IncomeViewModel>(
                     pendingIncomeViewModels.OrderByDescending(e => e.DateRequested)
                 );
